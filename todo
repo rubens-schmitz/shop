@@ -1,0 +1,18 @@
+choose icon for category from FontAwesome
+show search bar in nav on big window
+
+change colors, style on site
+
+payment
+
+zoom on preview
+allow video
+
+Form.svelte, product.go
+    is there a better way to send multiple files?
+    is the current way ideal or good enough?
+
+Icons
+    Could not find a declaration file for module 'svelte-fa/src/fa.svelte'. 
+    '/home/u/shop/client/node_modules/svelte-fa/src/fa.svelte' implicitly has 
+    an 'any' type.ts(7016)
