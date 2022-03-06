@@ -20,6 +20,10 @@ Execute create-schema.sql
 
 Install NodeJS https://nodejs.org/en/
 
+In the client directory, issue the following command
+
+npm i
+
 ## Build and Run
 
 To build and run the project, from the root project's folder, issue the following Go command

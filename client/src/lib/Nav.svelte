@@ -45,9 +45,11 @@
 		display: flex;
 		justify-content: space-around;
 	}
-    div {
+    a {
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 	div > * {
 		color: var(--text-color);

@@ -1,2 +1,3 @@
 client/node_modules/
-static/
+static
+!client/static/favicon.png
