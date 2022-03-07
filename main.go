@@ -12,19 +12,13 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	cp "github.com/otiai10/copy"
+
+	"github.com/rubens-schmitz/shop/util"
 )
-
-type ErrorResponse struct {
-	Ok    bool   `json:"id"`
-	Error string `json:"error"`
-}
-
-var DB *sql.DB
-var FS = http.FileServer(http.Dir("static"))
 
 func logRequest(r *http.Request) {
 	urlValues := r.URL.Query()
-	cartId := getCartId(r)
+	cartId := util.GetCartId(r)
 	if len(urlValues) == 0 {
 		log.Printf("%v %v %v\n", cartId, r.Method, r.URL.Path)
 	} else {
@@ -65,11 +59,11 @@ func connect() {
 	password := os.Getenv("DBPASSWORD")
 	dbname := os.Getenv("DBNAME")
 	connStr := fmt.Sprintf("user=%v password=%v dbname=%v", user, password, dbname)
-	DB, err = sql.Open("postgres", connStr)
+	util.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = DB.Ping()
+	err = util.DB.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -102,6 +102,7 @@
         width: 100%;
 		gap: 32px;
 		display: flex;
+        flex: 1;
 		flex-direction: column;
 		align-items: center;
 	}
@@ -113,6 +114,7 @@
     }
 	.elements {
 		display: flex;
+        flex: 1;
 		flex-wrap: wrap;
         justify-content: center;
         gap: 32px;

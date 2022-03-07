@@ -4,11 +4,18 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/rubens-schmitz/shop/category"
+	"github.com/rubens-schmitz/shop/item"
+	"github.com/rubens-schmitz/shop/product"
+	"github.com/rubens-schmitz/shop/util"
 )
+
+var FS = http.FileServer(http.Dir("static"))
 
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		verifyCartId(w, r)
+		util.VerifyCartId(w, r)
 		logRequest(r)
 		path := []byte(r.URL.Path)
 
@@ -17,7 +24,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			getCategories(w, r)
+			category.GetCategories(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/category", path)
@@ -27,13 +34,13 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				postCategory(w, r)
+				category.PostCategory(w, r)
 			case "GET":
-				getCategory(w, r)
+				category.GetCategory(w, r)
 			case "PUT":
-				putCategory(w, r)
+				category.PutCategory(w, r)
 			case "DELETE":
-				deleteCategory(w, r)
+				category.DeleteCategory(w, r)
 			}
 			return
 		}
@@ -43,7 +50,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			getItems(w, r)
+			item.GetItems(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/item", path)
@@ -53,11 +60,11 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				postItem(w, r)
+				item.PostItem(w, r)
 			case "PUT":
-				putItem(w, r)
+				item.PutItem(w, r)
 			case "DELETE":
-				deleteItem(w, r)
+				item.DeleteItem(w, r)
 			}
 			return
 		}
@@ -67,7 +74,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			getProducts(w, r)
+			product.GetProducts(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/product", path)
@@ -77,13 +84,13 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				postProduct(w, r)
+				product.PostProduct(w, r)
 			case "GET":
-				getProduct(w, r)
+				product.GetProduct(w, r)
 			case "PUT":
-				putProduct(w, r)
+				product.PutProduct(w, r)
 			case "DELETE":
-				deleteProduct(w, r)
+				product.DeleteProduct(w, r)
 			}
 			return
 		}
