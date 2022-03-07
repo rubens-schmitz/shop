@@ -17,6 +17,13 @@ type GetProductResponse struct {
 	Pictures   []string `json:"pictures"`
 }
 
+type GetProductsParams struct {
+	Limit      int
+	Offset     int
+	CategoryId int
+	Title      string
+}
+
 var errNoProduct = errors.New("The requested product does not exist.")
 
 func postProduct(w http.ResponseWriter, r *http.Request) {
@@ -53,61 +60,63 @@ func extractPicture(r *http.Request, n int) []byte {
 	return []byte(picture)
 }
 
-func getProducts(w http.ResponseWriter, r *http.Request) {
-	titles := r.URL.Query()["title"]
-	title := ""
-	if len(titles) != 0 {
-		title = titles[0]
-	}
-
-	offsets := r.URL.Query()["offset"]
-	offset := 0
+func getIntParam(r *http.Request, name string) (int, error) {
+	arr := r.URL.Query()[name]
+	val := 0
 	var err error
-	if len(offsets) != 0 {
-		offset, err = strconv.Atoi(offsets[0])
+	if len(arr) != 0 {
+		val, err = strconv.Atoi(arr[0])
 		if err != nil {
 			log.Fatal(err)
 		}
-		if offset < 0 {
-			writeAsJSON(w, &ErrorResponse{
-				Ok: false, Error: "Parameter 'offset' is less than zero."})
-			return
+		if val < 0 {
+			s := fmt.Sprintf("Parameter '%v' is less than zero.", name)
+			return 0, errors.New(s)
 		}
 	}
+	return val, nil
+}
 
-	categories := r.URL.Query()["categoryId"]
-	categoryId := 0
-	if len(categories) != 0 {
-		categoryId, err = strconv.Atoi(categories[0])
-		if err != nil {
-			log.Fatal(err)
-		}
-		if offset < 0 {
-			writeAsJSON(w, &ErrorResponse{
-				Ok: false, Error: "Parameter 'categoryId' is less than zero."})
-			return
-		}
+func getStringParam(r *http.Request, name string) string {
+	arr := r.URL.Query()[""]
+	val := ""
+	if len(arr) != 0 {
+		val = arr[0]
 	}
+	return val
+}
 
+func parseParams(r *http.Request) (GetProductsParams, error) {
+	limit, err := getIntParam(r, "limit")
+	offset, err := getIntParam(r, "offset")
+	categoryId, err := getIntParam(r, "categoryId")
+	title := getStringParam(r, "title")
+	params := &GetProductsParams{Limit: limit, Offset: offset,
+		CategoryId: categoryId, Title: title}
+	return *params, err
+}
+
+func getRows(params GetProductsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
-	if categoryId == 0 {
+	var err error
+	if params.CategoryId == 0 {
 		query = `select * from product where lower(title) 
-				 like lower('%' || $1 || '%') limit 2 offset $2`
-		rows, err = DB.Query(query, title, offset)
-		if err != nil {
-			log.Fatal(err)
-		}
+				 like lower('%' || $1 || '%') limit $2 offset $3`
+		rows, err = DB.Query(query, params.Title, params.Limit, params.Offset)
 	} else {
 		query = `select * from product where categoryId = $1 and lower(title) 
-				 like lower('%' || $2 || '%') limit 2 offset $3`
-		rows, err = DB.Query(query, categoryId, title, offset)
-		if err != nil {
-			log.Fatal(err)
-		}
+				 like lower('%' || $2 || '%') limit $3 offset $4`
+		rows, err = DB.Query(query, params.CategoryId, params.Title,
+			params.Limit, params.Offset)
 	}
-	defer rows.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return rows
+}
 
+func reallyGetProducts(rows *sql.Rows) []GetProductResponse {
 	products := make([]GetProductResponse, 0)
 	for rows.Next() {
 		product := new(GetProductResponse)
@@ -119,6 +128,19 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 		product.Pictures = getPictures(product.Id)
 		products = append(products, *product)
 	}
+	return products
+}
+
+func getProducts(w http.ResponseWriter, r *http.Request) {
+	params, err := parseParams(r)
+	if err != nil {
+		writeAsJSON(w, &ErrorResponse{
+			Ok: false, Error: err.Error()})
+		return
+	}
+	rows := getRows(params)
+	defer rows.Close()
+	products := reallyGetProducts(rows)
 	writeAsJSON(w, products)
 }
 

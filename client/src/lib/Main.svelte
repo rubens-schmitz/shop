@@ -15,13 +15,10 @@
 {/if}
 
 <style>
-	main {
-		padding: 32px 0;
-	}
 	.paddingTop {
-		padding-top: calc(var(--nav-height) + 32px);
+		padding-top: calc(var(--nav-height) + 48px);
 	}
 	.paddingBottom {
-		padding-bottom: calc(var(--nav-height) + 32px);
+		padding-bottom: calc(var(--nav-height) + 48px);
 	}
 </style>

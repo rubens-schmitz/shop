@@ -8,7 +8,11 @@ payment
 zoom on preview
 allow video
 
-Form.svelte, product.go
+client/src/lib/List.svelte
+    fix "await getCategories()" hack
+
+client/src/lib/Form.svelte
+product.go
     is there a better way to send multiple files?
     is the current way ideal or good enough?
 

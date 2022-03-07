@@ -8,7 +8,7 @@
 
 	let category: number;
 
-	export let limit = 2;
+	export let limit = 16;
 	export let getElements: ListGetElementsFn;
 	export let actionFn: ListActionFn = undefined;
 	export let actionName: string = undefined;
@@ -46,44 +46,48 @@
 </script>
 
 <div class="container">
-	<input
-		type="text"
-		placeholder="Search"
-		bind:value={search}
-		on:input={() => searchChanged()}
-	/>
+	<div class="controls">
+		<input
+			type="text"
+			placeholder="Search"
+			bind:value={search}
+			on:input={() => searchChanged()}
+		/>
 
-	{#if !categories}
-		{#await getCategories()}
-			<p>loading...</p>
-		{:then categories}
-			<select
-				on:change={() => searchChanged()}
-				bind:value={category}
-				name="category"
-				id="category"
-			>
-				<option selected value={0}>All</option>
-				{#each categories as category}
-					<option value={category.id}>{category.title}</option>
-				{/each}
-			</select>
-		{/await}
-	{/if}
+		{#if !categories}
+			{#await getCategories()}
+				<p>loading...</p>
+			{:then categories}
+				<select
+					on:change={() => searchChanged()}
+					bind:value={category}
+					name="category"
+					id="category"
+				>
+					<option selected value={0}>All</option>
+					{#each categories as category}
+						<option value={category.id}>{category.title}</option>
+					{/each}
+				</select>
+			{/await}
+		{/if}
+	</div>
 
 	{#await update()}
 		<p>...waiting</p>
 	{:then}
-		{#each elements as element}
-			<ListElement
-				{categories}
-				{update}
-				{cart}
-				{element}
-				{actionName}
-				{action}
-			/>
-		{/each}
+		<div class="elements">
+			{#each elements as element}
+				<ListElement
+					{categories}
+					{update}
+					{cart}
+					{element}
+					{actionName}
+					{action}
+				/>
+			{/each}
+		</div>
 		<div class="step">
 			<button on:click={() => update(-limit)}>Previous</button>
 			<button on:click={() => update(limit)}>Next</button>
@@ -95,13 +99,33 @@
 
 <style>
 	.container {
-		width: 200px;
-		gap: 16px;
+        width: 100%;
+		gap: 32px;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
+	}
+    .controls {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+	.elements {
+		display: flex;
+		flex-wrap: wrap;
+        justify-content: center;
+        gap: 32px;
 	}
 	.step {
+        width: 100%;
 		display: flex;
-		gap: 8px;
+		justify-content: center;
+		gap: 16px;
+        padding: 16px;
+        background: var(--tertiary-color);
 	}
+    .step > button {
+        width: 100px;
+    }
 </style>
