@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
 
-export const modalOpen = writable(false);
-export const modalContent = writable('');
+export const modal = writable('');
+export const qrcode = writable('');

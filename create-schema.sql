@@ -30,3 +30,11 @@ create table picture (
     productId int not null,
     foreign key(productId) references product(id) on delete cascade
 );
+
+create table deal (
+    id int generated always as identity primary key,
+    code text not null,
+    datestamp text not null,
+    cartId int not null,
+    foreign key(cartId) references cart(id) on delete cascade
+);

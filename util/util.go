@@ -29,26 +29,27 @@ func WriteAsJSON(w http.ResponseWriter, v any) {
 	}
 }
 
-func VerifyCartId(w http.ResponseWriter, r *http.Request) {
-	_, err := r.Cookie("cartId")
+func AddNewCartIdCookie(w http.ResponseWriter, r *http.Request) {
+	query := "insert into cart default values returning id"
+	row := DB.QueryRow(query)
+	var id string
+	err := row.Scan(&id)
 	if err != nil {
-		query := "insert into cart default values returning id"
-		row := DB.QueryRow(query)
-		var id string
-		err := row.Scan(&id)
+		log.Fatal(err)
+	}
+	cookie := http.Cookie{Name: "cartId", Value: id, Path: "/"}
+	http.SetCookie(w, &cookie)
+	r.AddCookie(&cookie)
+}
+
+func GetCartId(w http.ResponseWriter, r *http.Request) int {
+	cookie, err := r.Cookie("cartId")
+	if err != nil {
+		AddNewCartIdCookie(w, r)
+		cookie, err = r.Cookie("cartId")
 		if err != nil {
 			log.Fatal(err)
 		}
-		cookie := http.Cookie{Name: "cartId", Value: id, Path: "/"}
-		http.SetCookie(w, &cookie)
-		r.AddCookie(&cookie)
-	}
-}
-
-func GetCartId(r *http.Request) int {
-	cookie, err := r.Cookie("cartId")
-	if err != nil {
-		log.Fatal(err)
 	}
 	id, err := strconv.Atoi(cookie.Value)
 	if err != nil {

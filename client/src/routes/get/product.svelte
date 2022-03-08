@@ -6,7 +6,7 @@
 	import { getProduct } from '$lib/api/product.js';
 	import { postItem } from '$lib/api/item.js';
 	import { getURLIdParam } from '$lib/util.js';
-    import { modalOpen } from '$lib/stores.js'
+	import { modal } from '$lib/stores.js';
 
 	let title = '';
 	let pictureContainer: HTMLDivElement;
@@ -23,10 +23,10 @@
 		preview.setAttribute('src', pic);
 	}
 
-    async function action(id: number) {
-        await postItem(id);
-        $modalOpen = true;
-    }
+	async function action(id: number) {
+		await postItem(id);
+		$modal = 'success';
+	}
 </script>
 
 <svelte:head>

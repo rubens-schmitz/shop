@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getCategory } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-    import { modalOpen } from '$lib/stores.js'
+    import { modal } from '$lib/stores.js'
 
 	export let actionFn: FormActionFn;
 	export let actionName: string;
@@ -23,7 +23,7 @@
 		}
 		let request = makeRequest(id, title.value);
 		actionFn(request);
-        $modalOpen = true;
+        $modal = 'success'
 	}
 
 	async function fetchCategory() {

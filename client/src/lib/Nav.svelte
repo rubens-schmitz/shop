@@ -7,8 +7,6 @@
 		faShoppingCart,
 		faUser
 	} from '@fortawesome/free-solid-svg-icons';
-
-	console.log($page.url.pathname);
 </script>
 
 <nav>

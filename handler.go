@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/rubens-schmitz/shop/category"
+	"github.com/rubens-schmitz/shop/deal"
 	"github.com/rubens-schmitz/shop/item"
 	"github.com/rubens-schmitz/shop/product"
 	"github.com/rubens-schmitz/shop/util"
@@ -13,10 +14,19 @@ import (
 
 var FS = http.FileServer(http.Dir("static"))
 
+func logRequest(w http.ResponseWriter, r *http.Request) {
+	urlValues := r.URL.Query()
+	cartId := util.GetCartId(w, r)
+	if len(urlValues) == 0 {
+		log.Printf("%v %v %v\n", cartId, r.Method, r.URL.Path)
+	} else {
+		log.Printf("%v %v %v %v\n", cartId, r.Method, r.URL.Path, urlValues)
+	}
+}
+
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		util.VerifyCartId(w, r)
-		logRequest(r)
+		logRequest(w, r)
 		path := []byte(r.URL.Path)
 
 		match, err := regexp.Match("/api/categories", path)
@@ -91,6 +101,30 @@ func handler() http.Handler {
 				product.PutProduct(w, r)
 			case "DELETE":
 				product.DeleteProduct(w, r)
+			}
+			return
+		}
+
+		match, err = regexp.Match("/api/deals", path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if match {
+			deal.GetDeals(w, r)
+			return
+		}
+		match, err = regexp.Match("/api/deal", path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if match {
+			switch r.Method {
+			case "POST":
+				deal.PostDeal(w, r)
+			case "GET":
+				deal.GetDeal(w, r)
+			case "DELETE":
+				deal.DeleteDeal(w, r)
 			}
 			return
 		}

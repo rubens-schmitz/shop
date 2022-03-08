@@ -1,6 +1,10 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import ListElement from './ListElement.svelte';
 	import { getCategories } from '$lib/api/category.js';
+	import { postDeal } from './api/deal';
+	import { modal, qrcode } from '$lib/stores.js';
 
 	let search = '';
 	let elements = [];
@@ -43,6 +47,13 @@
 		offset = newOffset;
 		elements = data;
 	}
+
+	async function buyCart() {
+		let res = await postDeal();
+		$qrcode = res.qrcode;
+		$modal = 'buyCart';
+		goto('/');
+	}
 </script>
 
 <div class="container">
@@ -70,6 +81,10 @@
 					{/each}
 				</select>
 			{/await}
+		{/if}
+
+		{#if cart}
+			<button on:click={() => buyCart()}>Buy</button>
 		{/if}
 	</div>
 
@@ -99,35 +114,35 @@
 
 <style>
 	.container {
-        width: 100%;
+		width: 100%;
 		gap: 32px;
 		display: flex;
-        flex: 1;
+		flex: 1;
 		flex-direction: column;
 		align-items: center;
 	}
-    .controls {
-        width: 200px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+	.controls {
+		width: 200px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
 	.elements {
 		display: flex;
-        flex: 1;
+		flex: 1;
 		flex-wrap: wrap;
-        justify-content: center;
-        gap: 32px;
+		justify-content: center;
+		gap: 32px;
 	}
 	.step {
-        width: 100%;
+		width: 100%;
 		display: flex;
 		justify-content: center;
 		gap: 16px;
-        padding: 16px;
-        background: var(--tertiary-color);
+		padding: 16px;
+		background: var(--tertiary-color);
 	}
-    .step > button {
-        width: 100px;
-    }
+	.step > button {
+		width: 100px;
+	}
 </style>

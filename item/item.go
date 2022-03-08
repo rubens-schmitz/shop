@@ -34,7 +34,7 @@ func PostItem(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cartId := util.GetCartId(r)
+	cartId := util.GetCartId(w, r)
 	item := &PostItemRequest{ProductId: productId, CartId: cartId}
 	query := `select id, quantity from item where productId=$1 and cartId=$2`
 	row := util.DB.QueryRow(query, productId, cartId)
@@ -97,7 +97,7 @@ func GetItems(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	cartId := strconv.Itoa(util.GetCartId(r))
+	cartId := strconv.Itoa(util.GetCartId(w, r))
 
 	var query string
 	var rows *sql.Rows

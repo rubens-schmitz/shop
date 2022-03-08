@@ -16,16 +16,6 @@ import (
 	"github.com/rubens-schmitz/shop/util"
 )
 
-func logRequest(r *http.Request) {
-	urlValues := r.URL.Query()
-	cartId := util.GetCartId(r)
-	if len(urlValues) == 0 {
-		log.Printf("%v %v %v\n", cartId, r.Method, r.URL.Path)
-	} else {
-		log.Printf("%v %v %v %v\n", cartId, r.Method, r.URL.Path, urlValues)
-	}
-}
-
 func build() {
 	err := os.Chdir("client")
 	if err != nil {

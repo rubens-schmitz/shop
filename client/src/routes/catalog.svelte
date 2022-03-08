@@ -6,11 +6,11 @@
 	import List from '$lib/List.svelte';
 	import { getProducts } from '$lib/api/product.js';
 	import { postItem } from '$lib/api/item.js';
-	import { modalOpen } from '$lib/stores.js';
+	import { modal } from '$lib/stores.js';
 
 	async function actionFn(id: number) {
 		await postItem(id);
-		$modalOpen = true;
+		$modal = 'success';
 	}
 </script>
 

@@ -1,5 +1,9 @@
 /// <reference types="@sveltejs/kit" />
 
+interface PostDealResponse {
+    qrcode: string;
+}
+
 interface PostCategoryRequest {
 	title: string;
 }

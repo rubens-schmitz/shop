@@ -5,7 +5,7 @@
 	import { getProduct } from '$lib/api/product.js';
 	import { getCategories } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { modalOpen } from '$lib/stores.js';
+	import { modal } from '$lib/stores.js';
 
 	interface Picture {
 		id: number;
@@ -125,7 +125,7 @@
 			getResquestPictures()
 		);
 		actionFn(request);
-		$modalOpen = true;
+		$modal = 'success';
 	}
 
 	async function fetchElement() {
