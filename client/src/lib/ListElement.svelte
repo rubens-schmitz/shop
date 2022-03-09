@@ -46,7 +46,9 @@
 			<button on:click={removeAndUpdate}>Remove</button>
 			<div class="buttons-step">
 				<button on:click={() => changeQuantityAndUpdate(-1)}>-</button>
-				<span>{element.quantity}</span>
+				<div class="buttons-step-quantity">
+					<span>{element.quantity}</span>
+				</div>
 				<button on:click={() => changeQuantityAndUpdate(+1)}>+</button>
 			</div>
 		</div>
@@ -79,8 +81,12 @@
 		gap: 8px;
 	}
 	.buttons-step {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+	.buttons-step-quantity {
 		display: flex;
+		justify-content: center;
 		align-items: center;
-		gap: 16px;
 	}
 </style>

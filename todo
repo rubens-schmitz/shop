@@ -1,4 +1,8 @@
-remove underline from cartBuy button
+cart
+    set static size for quantity in the middle
+        maybe grid 3 parts
+
+implement deal
 
 choose icon for category from FontAwesome
 show search bar in nav on big window

@@ -68,6 +68,7 @@
 		padding: 8px;
 	}
 	.qrcode-button:hover {
+        text-decoration: none;
 		background-color: var(--accent-color-darker);
 	}
 </style>

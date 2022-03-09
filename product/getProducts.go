@@ -34,13 +34,14 @@ func getRows(params GetProductsParams) *sql.Rows {
 	if params.CategoryId == 0 {
 		query = `select id, title, price, categoryId from product
 				 where lower(title) like lower('%' || $1 || '%')
-				 limit $2 offset $3`
+				 order by title asc limit $2 offset $3`
 		rows, err = util.DB.Query(query, params.Title,
 			params.Limit, params.Offset)
 	} else {
 		query = `select id, title, price, categoryId from product
 				 where lower(title) like lower('%' || $1 || '%')
-				 and categoryId = $2 limit $3 offset $4`
+				 and categoryId = $2 
+				 order by title asc limit $3 offset $4`
 		rows, err = util.DB.Query(query, params.Title, params.CategoryId,
 			params.Limit, params.Offset)
 	}

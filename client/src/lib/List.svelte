@@ -6,12 +6,6 @@
 	import { postDeal } from './api/deal';
 	import { modal, qrcode } from '$lib/stores.js';
 
-	let search = '';
-	let elements = [];
-	let offset = 0;
-
-	let category: number;
-
 	export let limit = 16;
 	export let getElements: ListGetElementsFn;
 	export let actionFn: ListActionFn = undefined;
@@ -19,6 +13,12 @@
 	export let updateAfterAction = false;
 	export let cart = false;
 	export let categories = false;
+
+	let search = '';
+	let elements = [];
+	let offset = 0;
+	let total = 0;
+	let category: number;
 
 	function searchChanged() {
 		offset = 0;
@@ -46,6 +46,7 @@
 		}
 		offset = newOffset;
 		elements = data;
+		updateTotal();
 	}
 
 	async function buyCart() {
@@ -53,6 +54,14 @@
 		$qrcode = res.qrcode;
 		$modal = 'buyCart';
 		goto('/');
+	}
+
+	function updateTotal() {
+		total = 0;
+		for (let i = 0; i < elements.length; i++) {
+			let e = elements[i];
+			total += e.price * e.quantity;
+		}
 	}
 </script>
 
@@ -82,11 +91,14 @@
 				</select>
 			{/await}
 		{/if}
-
-		{#if cart}
-			<button on:click={() => buyCart()}>Buy</button>
-		{/if}
 	</div>
+
+	{#if cart}
+		<div class="buy-cart">
+			<span>Total: {total}</span>
+			<button on:click={() => buyCart()}>Buy</button>
+		</div>
+	{/if}
 
 	{#await update()}
 		<p>...waiting</p>
@@ -144,5 +156,8 @@
 	}
 	.step > button {
 		width: 100px;
+	}
+	.buy-cart {
+		width: 200px;
 	}
 </style>

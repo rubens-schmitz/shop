@@ -16,15 +16,6 @@ type PostItemRequest struct {
 	Quantity  int `json:"quantity"`
 }
 
-type GetItemResponse struct {
-	Id        int      `json:"id"`
-	ProductId int      `json:"productId"`
-	Title     string   `json:"title"`
-	Price     float32  `json:"price"`
-	Pictures  []string `json:"pictures"`
-	Quantity  int      `json:"quantity"`
-}
-
 func PostItem(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
@@ -36,12 +27,12 @@ func PostItem(w http.ResponseWriter, r *http.Request) {
 	}
 	cartId := util.GetCartId(w, r)
 	item := &PostItemRequest{ProductId: productId, CartId: cartId}
-	query := `select id, quantity from item where productId=$1 and cartId=$2`
+	query := `select id, quantity from item where productId = $1 and cartId = $2`
 	row := util.DB.QueryRow(query, productId, cartId)
 	err = row.Scan(&item.Id, &item.Quantity)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			query = "insert into item (productId, cartId) values ($1, $2)"
+			query = `insert into item (productId, cartId) values ($1, $2)`
 			_, err = util.DB.Exec(query, productId, cartId)
 			if err != nil {
 				log.Println(err)
@@ -53,89 +44,12 @@ func PostItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	item.Quantity += 1
-	query = "update item set quantity = $2 where id = $1"
+	query = `update item set quantity = $2 where id = $1`
 	_, err = util.DB.Exec(query, item.Id, item.Quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
 	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
-}
-
-func GetItems(w http.ResponseWriter, r *http.Request) {
-	titles := r.URL.Query()["title"]
-	title := ""
-	if len(titles) != 0 {
-		title = titles[0]
-	}
-
-	offsets := r.URL.Query()["offset"]
-	offset := 0
-	var err error
-	if len(offsets) != 0 {
-		offset, err = strconv.Atoi(offsets[0])
-		if err != nil {
-			log.Fatal(err)
-		}
-		if offset < 0 {
-			util.WriteAsJSON(w, &util.ErrorResponse{
-				Ok: false, Error: "Parameter 'offset' is less than zero."})
-			return
-		}
-	}
-
-	categories := r.URL.Query()["categoryId"]
-	categoryId := 0
-	if len(categories) != 0 {
-		categoryId, err = strconv.Atoi(categories[0])
-		if err != nil {
-			log.Fatal(err)
-		}
-		if offset < 0 {
-			util.WriteAsJSON(w, &util.ErrorResponse{
-				Ok: false, Error: "Parameter 'categoryId' is less than zero."})
-			return
-		}
-	}
-
-	cartId := strconv.Itoa(util.GetCartId(w, r))
-
-	var query string
-	var rows *sql.Rows
-	if categoryId == 0 {
-		query = `select item.id, product.id, product.title, product.price,
-				 item.quantity from product inner join item on
-				 product.id = item.productId where item.cartId = $1
-				 and lower(product.title) like lower('%' || $2 || '%')
-				 limit 2 offset $3`
-		rows, err = util.DB.Query(query, cartId, title, offset)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		query = `select item.id, product.id, product.title, product.price,
-				 item.quantity from product inner join item on
-				 product.id = item.productId where categoryId = $1 and 
-				 item.cartId = $2 and lower(product.title) like 
-				 lower('%' || $3 || '%') limit 2 offset $4`
-		rows, err = util.DB.Query(query, categoryId, cartId, title, offset)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	defer rows.Close()
-
-	items := make([]GetItemResponse, 0)
-	for rows.Next() {
-		item := new(GetItemResponse)
-		err := rows.Scan(&item.Id, &item.ProductId, &item.Title, &item.Price,
-			&item.Quantity)
-		if err != nil {
-			log.Fatal(err)
-		}
-		item.Pictures = util.GetPictures(item.ProductId)
-		items = append(items, *item)
-	}
-	util.WriteAsJSON(w, items)
 }
 
 func PutItem(w http.ResponseWriter, r *http.Request) {
@@ -167,7 +81,7 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	id := r.FormValue("id")
-	query := "delete from item where id=$1"
+	query := `delete from item where id = $1`
 	_, err = util.DB.Exec(query, id)
 	if err != nil {
 		log.Fatal(err)
