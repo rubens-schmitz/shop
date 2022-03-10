@@ -13,6 +13,7 @@
 
 <section>
 	<List
+		type="product"
 		getElements={getProducts}
 		actionFn={deleteProduct}
 		actionName="Delete"

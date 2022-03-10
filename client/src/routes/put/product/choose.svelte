@@ -20,6 +20,7 @@
 
 <section>
 	<List
+		type="product"
 		getElements={getProducts}
 		actionFn={gotoPutPage}
 		actionName="Edit"

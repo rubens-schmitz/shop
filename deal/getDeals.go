@@ -5,44 +5,68 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/item"
 	"github.com/rubens-schmitz/shop/util"
 )
 
-type GetDealResponse struct {
-	Id        int    `json:"id"`
-	Code      string `json:"code"`
-	Datestamp string `json:"datestamp"`
-	CartId    int    `json:"cartId"`
+type GetDealsParams struct {
+	Limit  int
+	Offset int
 }
 
-func getRows() *sql.Rows {
+func parseParams(r *http.Request) (GetDealsParams, error) {
+	limit, err := util.GetIntParam(r, "limit")
+	if err != nil {
+		return GetDealsParams{}, err
+	}
+	offset, err := util.GetIntParam(r, "offset")
+	if err != nil {
+		return GetDealsParams{}, err
+	}
+	params := GetDealsParams{Limit: limit, Offset: offset}
+	return params, nil
+}
+
+func queryRows(params GetDealsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
-	query = `select id, code, datestamp, cartId from deal`
-	rows, err = util.DB.Query(query)
+	query = `select id, datestamp, cartId from deal
+			 order by datestamp desc limit $1 offset $2`
+	rows, err = util.DB.Query(query, params.Limit, params.Offset)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return rows
 }
 
-func reallyGetDeals(rows *sql.Rows) []GetDealResponse {
+func makeDeals(rows *sql.Rows) []GetDealResponse {
 	deals := make([]GetDealResponse, 0)
 	for rows.Next() {
 		deal := new(GetDealResponse)
-		err := rows.Scan(&deal.Id, &deal.Code, &deal.Datestamp, &deal.CartId)
+		var cartId int
+		var datestamp string
+		err := rows.Scan(&deal.Id, &datestamp, &cartId)
 		if err != nil {
 			log.Fatal(err)
 		}
+		deal.Datestamp = shortDatestamp(datestamp)
+		params := item.GetItemsParams{Title: "", Offset: 0, Limit: 16,
+			CategoryId: 0, CartId: cartId}
+		items := item.GetItems(params)
+		deal.Price, deal.Quantity = computePriceAndQuantity(items)
 		deals = append(deals, *deal)
 	}
 	return deals
 }
 
-func GetDeals(w http.ResponseWriter, r *http.Request) {
-	rows := getRows()
+func GetDealsHandler(w http.ResponseWriter, r *http.Request) {
+	params, err := parseParams(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows := queryRows(params)
 	defer rows.Close()
-	deals := reallyGetDeals(rows)
+	deals := makeDeals(rows)
 	util.WriteAsJSON(w, deals)
 }

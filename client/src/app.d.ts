@@ -1,7 +1,7 @@
 /// <reference types="@sveltejs/kit" />
 
 interface PostDealResponse {
-    qrcode: string;
+	qrcode: string;
 }
 
 interface PostCategoryRequest {
@@ -41,21 +41,32 @@ interface GetItemResponse extends GetProductResponse {
 	quantity: number;
 }
 
+interface GetDealResponse {
+	id: number;
+	code: string;
+	datestamp: string;
+	price: number;
+	quantity: number;
+	cartId: number;
+}
+
 type ListActionFn = (id: number) => Promise<any>;
+
 type ListGetElementsFn = (
-    limit: number,
+	limit: number,
 	offset: number,
 	title: string,
 	categoryId: number
 ) => Promise<any[]>;
 
 interface ListElement {
-	id: number;
-	title: string;
-	price: number;
-	pictures: string[];
+	id?: number;
+	title?: string;
+	price?: number;
+	pictures?: string[];
 	productId?: number;
 	quantity?: number;
+	datestamp?: string;
 }
 
 type FormActionFn = (request: any) => void;

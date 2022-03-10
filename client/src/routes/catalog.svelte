@@ -19,5 +19,10 @@
 </svelte:head>
 
 <section>
-	<List getElements={getProducts} {actionFn} actionName="Add" />
+	<List
+		type="product"
+		getElements={getProducts}
+		{actionFn}
+		actionName="Add"
+	/>
 </section>

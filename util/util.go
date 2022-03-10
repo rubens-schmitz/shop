@@ -2,12 +2,19 @@ package util
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/png"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
 )
 
 type ErrorResponse struct {
@@ -37,9 +44,9 @@ func AddNewCartIdCookie(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cookie := http.Cookie{Name: "cartId", Value: id, Path: "/"}
-	http.SetCookie(w, &cookie)
-	r.AddCookie(&cookie)
+	cookie := &http.Cookie{Name: "cartId", Value: id, Path: "/"}
+	http.SetCookie(w, cookie)
+	r.AddCookie(cookie)
 }
 
 func GetCartId(w http.ResponseWriter, r *http.Request) int {
@@ -102,3 +109,39 @@ func GetStringParam(r *http.Request, name string) string {
 	}
 	return val
 }
+
+func EncodeQRCode(code string) string {
+	enc := qrcode.NewQRCodeWriter()
+	img, err := enc.Encode(code, gozxing.BarcodeFormat_QR_CODE, 256, 256, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	file, err := os.CreateTemp("", "")
+	defer file.Close()
+	err = png.Encode(file, img)
+	if err != nil {
+		log.Fatal(err)
+	}
+	data, err := ioutil.ReadFile(file.Name())
+	if err != nil {
+		log.Fatal(err)
+	}
+	qrcode := "data:image/png;base64,"
+	qrcode += base64.StdEncoding.EncodeToString(data)
+	return qrcode
+}
+
+// func DecodeQRCode(qrcode string) {
+// 	// open and decode image file
+// 	file, _ := os.Open("qrcode.png")
+// 	img, _, _ := image.Decode(file)
+
+// 	// prepare BinaryBitmap
+// 	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
+
+// 	// decode image
+// 	qrReader := qrcode.NewQRCodeReader()
+// 	result, _ := qrReader.Decode(bmp, nil)
+
+// 	log.Println(result)
+// }

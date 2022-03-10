@@ -22,12 +22,12 @@ func parseParams(r *http.Request) (GetProductsParams, error) {
 		return GetProductsParams{}, err
 	}
 	title := util.GetStringParam(r, "title")
-	params := &GetProductsParams{Limit: limit, Offset: offset,
+	params := GetProductsParams{Limit: limit, Offset: offset,
 		CategoryId: categoryId, Title: title}
-	return *params, nil
+	return params, nil
 }
 
-func getRows(params GetProductsParams) *sql.Rows {
+func queryRows(params GetProductsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -51,7 +51,7 @@ func getRows(params GetProductsParams) *sql.Rows {
 	return rows
 }
 
-func reallyGetProducts(rows *sql.Rows) []GetProductResponse {
+func makeProducts(rows *sql.Rows) []GetProductResponse {
 	products := make([]GetProductResponse, 0)
 	for rows.Next() {
 		product := new(GetProductResponse)
@@ -66,14 +66,14 @@ func reallyGetProducts(rows *sql.Rows) []GetProductResponse {
 	return products
 }
 
-func GetProducts(w http.ResponseWriter, r *http.Request) {
+func GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := parseParams(r)
 	if err != nil {
-		util.WriteAsJSON(w, &util.ErrorResponse{Ok: false, Error: err.Error()})
+		util.WriteAsJSON(w, util.ErrorResponse{Ok: false, Error: err.Error()})
 		return
 	}
-	rows := getRows(params)
+	rows := queryRows(params)
 	defer rows.Close()
-	products := reallyGetProducts(rows)
+	products := makeProducts(rows)
 	util.WriteAsJSON(w, products)
 }

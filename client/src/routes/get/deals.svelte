@@ -4,13 +4,13 @@
 
 <script lang="ts">
 	import List from '$lib/List.svelte';
-	import { getItems } from '$lib/api/item.js';
+	import { getDeals } from '$lib/api/deal.js';
 </script>
 
 <svelte:head>
-	<title>Cart</title>
+	<title>Deals</title>
 </svelte:head>
 
 <section>
-	<List type="item" getElements={getItems} />
+	<List type="deal" getElements={getDeals} actionName="Detail" />
 </section>

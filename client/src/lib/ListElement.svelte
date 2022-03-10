@@ -7,14 +7,15 @@
 	export let actionName: string;
 	export let action: (id: number) => Promise<void>;
 	export let update: (offsetDelta?: number) => Promise<any>;
-	export let cart: boolean;
-	export let categories: boolean;
+	export let type: string;
 
 	let href: string;
 
 	onMount(() => {
-		if (cart) {
+		if (type === 'item' || type === 'dealItem') {
 			href = `/get/product?id=${element.productId}`;
+		} else if (type === 'deal') {
+			href = `/get/deal?id=${element.id}`;
 		} else {
 			href = `/get/product?id=${element.id}`;
 		}
@@ -33,15 +34,30 @@
 
 <div class="container">
 	<a sveltekit:prefetch {href}>
-		{#if !categories}
+		{#if type === 'product' || type === 'item'}
 			<img class="preview" src={element.pictures[0]} alt="preview" />
-		{/if}
-		<span>{element.title}</span>
-		{#if !categories}
+			<span>{element.title}</span>
 			<span>${element.price}</span>
+		{:else if type == 'dealItem'}
+			<img class="preview" src={element.pictures[0]} alt="preview" />
+			<span>{element.title}</span>
+			<span>${element.price}</span>
+			{#if element.quantity > 1}
+				<span>{element.quantity} units</span>
+			{:else}
+				<span>{element.quantity} unit</span>
+			{/if}
+		{:else if type === 'deal'}
+			<div class="deal">
+				<span>{element.datestamp}</span>
+				<span>Price: {element.price}</span>
+				<span>Quantity: {element.quantity}</span>
+			</div>
+		{:else}
+			<span>{element.title}</span>
 		{/if}
 	</a>
-	{#if cart}
+	{#if type === 'item'}
 		<div class="buttons">
 			<button on:click={removeAndUpdate}>Remove</button>
 			<div class="buttons-step">
@@ -52,7 +68,9 @@
 				<button on:click={() => changeQuantityAndUpdate(+1)}>+</button>
 			</div>
 		</div>
-	{:else}
+	{:else if type === 'deal' || type === 'dealItem'}
+		<a class="deal-button" {href}>{actionName}</a>
+	{:else if type === 'product' || type === 'category'}
 		<button on:click={() => action(element.id)}>
 			{actionName}
 		</button>
@@ -75,6 +93,7 @@
 		width: 200px;
 		height: 200px;
 	}
+
 	.buttons {
 		display: flex;
 		flex-direction: column;
@@ -88,5 +107,26 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.deal {
+		display: flex;
+		flex-direction: column;
+	}
+	.deal-button {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		cursor: pointer;
+		background: var(--accent-color);
+		color: white;
+		font-weight: bold;
+		border-radius: 4px;
+		padding: 8px;
+	}
+	.deal-button:hover {
+		text-decoration: none;
+		background-color: var(--accent-color-darker);
 	}
 </style>

@@ -25,7 +25,7 @@ type GetItemsParams struct {
 	CartId     int
 }
 
-func getParams(w http.ResponseWriter, r *http.Request) GetItemsParams {
+func parseParams(w http.ResponseWriter, r *http.Request) GetItemsParams {
 	title := util.GetStringParam(r, "title")
 	limit, err := util.GetIntParam(r, "limit")
 	if err != nil {
@@ -39,12 +39,18 @@ func getParams(w http.ResponseWriter, r *http.Request) GetItemsParams {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cartId := util.GetCartId(w, r)
+	cartId, err := util.GetIntParam(r, "cartId")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if cartId == 0 {
+		cartId = util.GetCartId(w, r)
+	}
 	return GetItemsParams{Title: title, Limit: limit, Offset: offset,
 		CategoryId: categoryId, CartId: cartId}
 }
 
-func getRows(params GetItemsParams) *sql.Rows {
+func queryRows(params GetItemsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -75,7 +81,7 @@ func getRows(params GetItemsParams) *sql.Rows {
 	return rows
 }
 
-func reallyGetItems(rows *sql.Rows) []GetItemResponse {
+func makeItems(rows *sql.Rows) []GetItemResponse {
 	items := make([]GetItemResponse, 0)
 	for rows.Next() {
 		item := new(GetItemResponse)
@@ -90,10 +96,15 @@ func reallyGetItems(rows *sql.Rows) []GetItemResponse {
 	return items
 }
 
-func GetItems(w http.ResponseWriter, r *http.Request) {
-	params := getParams(w, r)
-	rows := getRows(params)
+func GetItems(params GetItemsParams) []GetItemResponse {
+	rows := queryRows(params)
 	defer rows.Close()
-	items := reallyGetItems(rows)
+	items := makeItems(rows)
+	return items
+}
+
+func GetItemsHandler(w http.ResponseWriter, r *http.Request) {
+	params := parseParams(w, r)
+	items := GetItems(params)
 	util.WriteAsJSON(w, items)
 }

@@ -28,7 +28,7 @@ func parseParams(r *http.Request) (GetCategoriesParams, error) {
 	return params, nil
 }
 
-func getRows(params GetCategoriesParams) *sql.Rows {
+func queryRows(params GetCategoriesParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -50,7 +50,7 @@ func getRows(params GetCategoriesParams) *sql.Rows {
 	return rows
 }
 
-func reallyGetCategories(rows *sql.Rows) []GetCategoryResponse {
+func makeCategories(rows *sql.Rows) []GetCategoryResponse {
 	categories := make([]GetCategoryResponse, 0)
 	for rows.Next() {
 		category := new(GetCategoryResponse)
@@ -63,14 +63,14 @@ func reallyGetCategories(rows *sql.Rows) []GetCategoryResponse {
 	return categories
 }
 
-func GetCategories(w http.ResponseWriter, r *http.Request) {
+func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := parseParams(r)
 	if err != nil {
 		util.WriteAsJSON(w, &util.ErrorResponse{Ok: false, Error: err.Error()})
 		return
 	}
-	rows := getRows(params)
+	rows := queryRows(params)
 	defer rows.Close()
-	categories := reallyGetCategories(rows)
+	categories := makeCategories(rows)
 	util.WriteAsJSON(w, categories)
 }

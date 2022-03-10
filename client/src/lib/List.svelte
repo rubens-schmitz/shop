@@ -11,8 +11,8 @@
 	export let actionFn: ListActionFn = undefined;
 	export let actionName: string = undefined;
 	export let updateAfterAction = false;
-	export let cart = false;
-	export let categories = false;
+	export let type: string;
+	export let dealItem: GetDealResponse = undefined;
 
 	let search = '';
 	let elements = [];
@@ -46,7 +46,7 @@
 		}
 		offset = newOffset;
 		elements = data;
-		updateTotal();
+		if (type === 'item') updateTotal();
 	}
 
 	async function buyCart() {
@@ -67,14 +67,22 @@
 
 <div class="container">
 	<div class="controls">
-		<input
-			type="text"
-			placeholder="Search"
-			bind:value={search}
-			on:input={() => searchChanged()}
-		/>
+		{#if type === 'dealItem'}
+			<span>Datestamp: {dealItem.datestamp}</span>
+			<span>Price: {dealItem.price}</span>
+			<span>Quantity: {dealItem.quantity}</span>
+		{/if}
 
-		{#if !categories}
+		{#if type !== 'deal'}
+			<input
+				type="text"
+				placeholder="Search"
+				bind:value={search}
+				on:input={() => searchChanged()}
+			/>
+		{/if}
+
+		{#if type === 'product' || type === 'item'}
 			{#await getCategories()}
 				<p>loading...</p>
 			{:then categories}
@@ -93,7 +101,7 @@
 		{/if}
 	</div>
 
-	{#if cart}
+	{#if type === 'item'}
 		<div class="buy-cart">
 			<span>Total: {total}</span>
 			<button on:click={() => buyCart()}>Buy</button>
@@ -105,14 +113,7 @@
 	{:then}
 		<div class="elements">
 			{#each elements as element}
-				<ListElement
-					{categories}
-					{update}
-					{cart}
-					{element}
-					{actionName}
-					{action}
-				/>
+				<ListElement {type} {update} {element} {actionName} {action} />
 			{/each}
 		</div>
 		<div class="step">
@@ -140,6 +141,7 @@
 		gap: 8px;
 	}
 	.elements {
+		max-width: var(--elements-max-width);
 		display: flex;
 		flex: 1;
 		flex-wrap: wrap;

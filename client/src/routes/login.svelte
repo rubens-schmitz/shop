@@ -8,7 +8,8 @@
 	import {
 		faPlus,
 		faEdit,
-		faMinus
+		faMinus,
+		faEye
 	} from '@fortawesome/free-solid-svg-icons';
 </script>
 
@@ -54,6 +55,15 @@
 		<a sveltekit:prefetch href="/delete/category">
 			<span>Delete category</span>
 			<Fa icon={faMinus} />
+		</a>
+	</div>
+
+	<br />
+
+	<div class:active={$page.url.pathname === '/get/deals'}>
+		<a sveltekit:prefetch href="/get/deals">
+			<span>See deals</span>
+			<Fa icon={faEye} />
 		</a>
 	</div>
 </section>

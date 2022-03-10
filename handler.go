@@ -34,7 +34,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			category.GetCategories(w, r)
+			category.GetCategoriesHandler(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/category", path)
@@ -44,13 +44,13 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				category.PostCategory(w, r)
+				category.PostCategoryHandler(w, r)
 			case "GET":
-				category.GetCategory(w, r)
+				category.GetCategoryHandler(w, r)
 			case "PUT":
-				category.PutCategory(w, r)
+				category.PutCategoryHandler(w, r)
 			case "DELETE":
-				category.DeleteCategory(w, r)
+				category.DeleteCategoryHandler(w, r)
 			}
 			return
 		}
@@ -60,7 +60,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			item.GetItems(w, r)
+			item.GetItemsHandler(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/item", path)
@@ -70,11 +70,11 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				item.PostItem(w, r)
+				item.PostItemHandler(w, r)
 			case "PUT":
-				item.PutItem(w, r)
+				item.PutItemHandler(w, r)
 			case "DELETE":
-				item.DeleteItem(w, r)
+				item.DeleteItemHandler(w, r)
 			}
 			return
 		}
@@ -84,7 +84,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			product.GetProducts(w, r)
+			product.GetProductsHandler(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/product", path)
@@ -94,13 +94,13 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				product.PostProduct(w, r)
+				product.PostProductHandler(w, r)
 			case "GET":
-				product.GetProduct(w, r)
+				product.GetProductHandler(w, r)
 			case "PUT":
-				product.PutProduct(w, r)
+				product.PutProductHandler(w, r)
 			case "DELETE":
-				product.DeleteProduct(w, r)
+				product.DeleteProductHandler(w, r)
 			}
 			return
 		}
@@ -110,7 +110,7 @@ func handler() http.Handler {
 			log.Fatal(err)
 		}
 		if match {
-			deal.GetDeals(w, r)
+			deal.GetDealsHandler(w, r)
 			return
 		}
 		match, err = regexp.Match("/api/deal", path)
@@ -120,11 +120,11 @@ func handler() http.Handler {
 		if match {
 			switch r.Method {
 			case "POST":
-				deal.PostDeal(w, r)
+				deal.PostDealHandler(w, r)
 			case "GET":
-				deal.GetDeal(w, r)
+				deal.GetDealHandler(w, r)
 			case "DELETE":
-				deal.DeleteDeal(w, r)
+				deal.DeleteDealHandler(w, r)
 			}
 			return
 		}

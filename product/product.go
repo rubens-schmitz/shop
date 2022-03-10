@@ -28,7 +28,7 @@ type GetProductsParams struct {
 
 var errNoProduct = errors.New("The requested product does not exist.")
 
-func PostProduct(w http.ResponseWriter, r *http.Request) {
+func PostProductHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +53,7 @@ func PostProduct(w http.ResponseWriter, r *http.Request) {
 		query = "insert into picture (productId, bytes) values ($1, $2)"
 		_, err = util.DB.Exec(query, id, bytes)
 	}
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }
 
 func extractPicture(r *http.Request, n int) []byte {
@@ -62,13 +62,13 @@ func extractPicture(r *http.Request, n int) []byte {
 	return []byte(picture)
 }
 
-func GetProduct(w http.ResponseWriter, r *http.Request) {
+func GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := util.GetIntParam(r, "id")
 	if err != nil {
 		log.Fatal(err)
 	}
 	pictures := util.GetPictures(id)
-	product := &GetProductResponse{Id: id, Pictures: pictures}
+	product := GetProductResponse{Id: id, Pictures: pictures}
 	query := "select title, price, categoryId from product where id=$1"
 	row := util.DB.QueryRow(query, id)
 	err = row.Scan(&product.Title, &product.Price, &product.CategoryId)
@@ -82,7 +82,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 	util.WriteAsJSON(w, product)
 }
 
-func PutProduct(w http.ResponseWriter, r *http.Request) {
+func PutProductHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -91,38 +91,33 @@ func PutProduct(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	price := r.FormValue("price")
 	categoryId := r.FormValue("categoryId")
-
 	query := `update product set title = $1, price = $2, categoryId = $3
 	          where id = $4`
 	_, err = util.DB.Exec(query, title, price, categoryId, id)
-
 	query = "delete from picture where productId = $1"
 	_, err = util.DB.Exec(query, id)
-
 	pictures, err := strconv.Atoi(r.FormValue("pictures"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for i := 0; i < pictures; i++ {
 		bytes := extractPicture(r, i)
 		query = "insert into picture (productId, bytes) values ($1, $2)"
 		_, err = util.DB.Exec(query, id, bytes)
 	}
-
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }
 
-func DeleteProduct(w http.ResponseWriter, r *http.Request) {
+func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
 	}
 	id := r.FormValue("id")
-	query := "delete from product where id=$1"
+	query := `delete from product where id = $1`
 	_, err = util.DB.Exec(query, id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }

@@ -13,7 +13,7 @@ type GetCategoryResponse struct {
 	Title string `json:"title"`
 }
 
-func PostCategory(w http.ResponseWriter, r *http.Request) {
+func PostCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +27,7 @@ func PostCategory(w http.ResponseWriter, r *http.Request) {
 	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
 }
 
-func GetCategory(w http.ResponseWriter, r *http.Request) {
+func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := util.GetIntParam(r, "id")
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +46,7 @@ func GetCategory(w http.ResponseWriter, r *http.Request) {
 	util.WriteAsJSON(w, category)
 }
 
-func PutCategory(w http.ResponseWriter, r *http.Request) {
+func PutCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +61,7 @@ func PutCategory(w http.ResponseWriter, r *http.Request) {
 	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
 }
 
-func DeleteCategory(w http.ResponseWriter, r *http.Request) {
+func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)

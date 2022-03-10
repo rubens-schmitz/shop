@@ -11,7 +11,7 @@ export async function postItem(productId) {
  * @param {any} rawItem
  * @return {GetItemResponse}
  */
-function makeItem(rawItem) {
+export function makeItem(rawItem) {
 	return {
 		id: parseInt(rawItem.id),
 		title: rawItem.title,
@@ -24,16 +24,21 @@ function makeItem(rawItem) {
 }
 
 /**
+ * @param {number} limit
+ * @param {number} offset
+ * @param {string} title
+ * @param {number} categoryId
  * @return {Promise<GetItemResponse[]>}
  */
 export async function getItems(
 	limit = 0,
 	offset = 0,
 	title = '',
-	categoryId = 0
+	categoryId = 0,
+	cartId = 0
 ) {
 	let params = `?limit=${limit}&offset=${offset}&title=${title}`;
-    params += `&categoryId=${categoryId}`;
+	params += `&categoryId=${categoryId}&cartId=${cartId}`;
 	const res = await fetch('/api/items' + params);
 	const rawItems = await res.json();
 	let items = [];

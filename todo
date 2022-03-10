@@ -1,7 +1,4 @@
-cart
-    set static size for quantity in the middle
-        maybe grid 3 parts
-
+compute price and quantity at time of deal, store in DB
 implement deal
 
 choose icon for category from FontAwesome
@@ -10,6 +7,9 @@ change colors, style on site
 payment
 zoom on preview
 allow video
+
+ListGetElementsFn
+    is categoryId really necessary?
 
 client/src/lib/List.svelte
     fix "await getCategories()" hack
@@ -23,3 +23,6 @@ Icons
     Could not find a declaration file for module 'svelte-fa/src/fa.svelte'. 
     '/home/u/shop/client/node_modules/svelte-fa/src/fa.svelte' implicitly has 
     an 'any' type.ts(7016)
+
+tsconfig.json problems on vscode
+    Cannot write file ... because it would overwrite input file

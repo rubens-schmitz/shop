@@ -20,7 +20,7 @@
 
 <section>
 	<List
-		categories
+		type="category"
 		getElements={getCategories}
 		actionFn={gotoPutCategoryPage}
 		actionName="Edit"

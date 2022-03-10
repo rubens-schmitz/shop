@@ -13,7 +13,7 @@
 
 <section>
 	<List
-		categories
+		type="category"
 		getElements={getCategories}
 		actionFn={deleteCategory}
 		actionName="Delete"
