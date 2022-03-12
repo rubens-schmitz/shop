@@ -4,6 +4,7 @@
 	import ListElement from './ListElement.svelte';
 	import { getCategories } from '$lib/api/category.js';
 	import { postDeal } from './api/deal';
+	import { getCart } from './api/cart';
 	import { modal, qrcode } from '$lib/stores.js';
 
 	export let limit = 16;
@@ -17,8 +18,8 @@
 	let search = '';
 	let elements = [];
 	let offset = 0;
-	let total = 0;
 	let category: number;
+	let cart: GetCartResponse = { price: 0, quantity: 0 };
 
 	function searchChanged() {
 		offset = 0;
@@ -46,7 +47,7 @@
 		}
 		offset = newOffset;
 		elements = data;
-		if (type === 'item') updateTotal();
+		if (type === 'item') await updateCart();
 	}
 
 	async function buyCart() {
@@ -56,12 +57,8 @@
 		goto('/');
 	}
 
-	function updateTotal() {
-		total = 0;
-		for (let i = 0; i < elements.length; i++) {
-			let e = elements[i];
-			total += e.price * e.quantity;
-		}
+	async function updateCart() {
+		cart = await getCart();
 	}
 </script>
 
@@ -103,7 +100,8 @@
 
 	{#if type === 'item'}
 		<div class="buy-cart">
-			<span>Total: {total}</span>
+			<span>Price: {cart.price}</span>
+			<span>Quantity: {cart.quantity}</span>
 			<button on:click={() => buyCart()}>Buy</button>
 		</div>
 	{/if}
@@ -161,5 +159,7 @@
 	}
 	.buy-cart {
 		width: 200px;
+		display: flex;
+		flex-direction: column;
 	}
 </style>

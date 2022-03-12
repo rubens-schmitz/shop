@@ -5,18 +5,18 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/rubens-schmitz/shop/cart"
 	"github.com/rubens-schmitz/shop/category"
 	"github.com/rubens-schmitz/shop/deal"
 	"github.com/rubens-schmitz/shop/item"
 	"github.com/rubens-schmitz/shop/product"
-	"github.com/rubens-schmitz/shop/util"
 )
 
 var FS = http.FileServer(http.Dir("static"))
 
 func logRequest(w http.ResponseWriter, r *http.Request) {
 	urlValues := r.URL.Query()
-	cartId := util.GetCartId(w, r)
+	cartId := cart.GetCartId(w, r)
 	if len(urlValues) == 0 {
 		log.Printf("%v %v %v\n", cartId, r.Method, r.URL.Path)
 	} else {
@@ -51,6 +51,18 @@ func handler() http.Handler {
 				category.PutCategoryHandler(w, r)
 			case "DELETE":
 				category.DeleteCategoryHandler(w, r)
+			}
+			return
+		}
+
+		match, err = regexp.Match("/api/cart", path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if match {
+			switch r.Method {
+			case "GET":
+				cart.GetCartHandler(w, r)
 			}
 			return
 		}

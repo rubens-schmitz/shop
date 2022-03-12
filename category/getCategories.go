@@ -5,30 +5,25 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
-type GetCategoriesParams struct {
-	Limit  int
-	Offset int
-	Title  string
-}
-
-func parseParams(r *http.Request) (GetCategoriesParams, error) {
+func parseParams(r *http.Request) (types.GetCategoriesParams, error) {
 	limit, err := util.GetIntParam(r, "limit")
 	if err != nil {
-		return GetCategoriesParams{}, err
+		return types.GetCategoriesParams{}, err
 	}
 	offset, err := util.GetIntParam(r, "offset")
 	if err != nil {
-		return GetCategoriesParams{}, err
+		return types.GetCategoriesParams{}, err
 	}
 	title := util.GetStringParam(r, "title")
-	params := GetCategoriesParams{Limit: limit, Offset: offset, Title: title}
+	params := types.GetCategoriesParams{Limit: limit, Offset: offset, Title: title}
 	return params, nil
 }
 
-func queryRows(params GetCategoriesParams) *sql.Rows {
+func queryRows(params types.GetCategoriesParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -50,10 +45,10 @@ func queryRows(params GetCategoriesParams) *sql.Rows {
 	return rows
 }
 
-func makeCategories(rows *sql.Rows) []GetCategoryResponse {
-	categories := make([]GetCategoryResponse, 0)
+func makeCategories(rows *sql.Rows) []types.GetCategoryResponse {
+	categories := make([]types.GetCategoryResponse, 0)
 	for rows.Next() {
-		category := new(GetCategoryResponse)
+		category := new(types.GetCategoryResponse)
 		err := rows.Scan(&category.Id, &category.Title)
 		if err != nil {
 			log.Fatal(err)

@@ -3,59 +3,27 @@ package deal
 import (
 	"log"
 	"net/http"
-	"regexp"
-	"time"
 
-	"github.com/rubens-schmitz/shop/item"
+	"github.com/rubens-schmitz/shop/cart"
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 	"github.com/sethvargo/go-password/password"
 )
-
-type PostDealResponse struct {
-	Qrcode string `json:"qrcode"`
-}
-
-type GetDealResponse struct {
-	Id        int     `json:"id"`
-	Quantity  int     `json:"quantity"`
-	Price     float32 `json:"price"`
-	Datestamp string  `json:"datestamp"`
-	CartId    int     `json:"cartId"`
-}
-
-func shortDatestamp(datestamp string) string {
-	r, err := regexp.Compile("([0-9]+-[0-9]+-[0-9]+ [0-9]+:[0-9]+:[0-9]+)")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return r.FindString(datestamp)
-}
-
-func computePriceAndQuantity(items []item.GetItemResponse) (float32, int) {
-	var price float32 = 0.0
-	var quantity int = 0
-	for i := 0; i < len(items); i++ {
-		price += items[i].Price * float32(items[i].Quantity)
-		quantity += items[i].Quantity
-	}
-	return price, quantity
-}
 
 func PostDealHandler(w http.ResponseWriter, r *http.Request) {
 	code, err := password.Generate(64, 10, 10, false, false)
 	if err != nil {
 		log.Fatal(err)
 	}
-	datestamp := time.Now()
-	cartId := util.GetCartId(w, r)
-	query := `insert into deal (code, datestamp, cartId) values ($1, $2, $3)`
-	_, err = util.DB.Exec(query, code, datestamp, cartId)
+	cartId := cart.GetCartId(w, r)
+	query := `insert into deal (code, cartId) values ($1, $2)`
+	_, err = util.DB.Exec(query, code, cartId)
 	if err != nil {
 		log.Fatal(err)
 	}
 	qrcode := util.EncodeQRCode(code)
-	res := PostDealResponse{Qrcode: qrcode}
-	util.AddNewCartIdCookie(w, r)
+	res := types.PostDealResponse{Qrcode: qrcode}
+	cart.AddNewCartIdCookie(w, r)
 	util.WriteAsJSON(w, res)
 }
 
@@ -64,22 +32,20 @@ func GetDealHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	query := `select datestamp, cartId from deal where id = $1`
+	query := `select cart.price, cart.quantity, cart.datestamp
+			  from deal inner join cart on cart.id = deal.cartId
+			  where id = $1`
 	row := util.DB.QueryRow(query, id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	deal := GetDealResponse{Id: id}
+	deal := types.GetDealResponse{Id: id}
 	var datestamp string
-	row.Scan(&datestamp, &deal.CartId)
+	row.Scan(&deal.Price, &deal.Quantity, &datestamp)
+	deal.Datestamp = util.ShortDatestamp(datestamp)
 	if err != nil {
 		log.Fatal(err)
 	}
-	deal.Datestamp = shortDatestamp(datestamp)
-	params := item.GetItemsParams{Title: "", Offset: 0, Limit: 16,
-		CategoryId: 0, CartId: deal.CartId}
-	items := item.GetItems(params)
-	deal.Price, deal.Quantity = computePriceAndQuantity(items)
 	util.WriteAsJSON(w, deal)
 }
 

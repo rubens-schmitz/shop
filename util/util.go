@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 
 	"github.com/makiuchi-d/gozxing"
@@ -36,33 +37,12 @@ func WriteAsJSON(w http.ResponseWriter, v any) {
 	}
 }
 
-func AddNewCartIdCookie(w http.ResponseWriter, r *http.Request) {
-	query := "insert into cart default values returning id"
-	row := DB.QueryRow(query)
-	var id string
-	err := row.Scan(&id)
+func ShortDatestamp(datestamp string) string {
+	r, err := regexp.Compile("([0-9]+-[0-9]+-[0-9]+ [0-9]+:[0-9]+:[0-9]+)")
 	if err != nil {
 		log.Fatal(err)
 	}
-	cookie := &http.Cookie{Name: "cartId", Value: id, Path: "/"}
-	http.SetCookie(w, cookie)
-	r.AddCookie(cookie)
-}
-
-func GetCartId(w http.ResponseWriter, r *http.Request) int {
-	cookie, err := r.Cookie("cartId")
-	if err != nil {
-		AddNewCartIdCookie(w, r)
-		cookie, err = r.Cookie("cartId")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	id, err := strconv.Atoi(cookie.Value)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return id
+	return r.FindString(datestamp)
 }
 
 func GetPictures(productId int) []string {

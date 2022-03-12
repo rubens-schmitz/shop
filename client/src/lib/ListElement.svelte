@@ -69,7 +69,13 @@
 			</div>
 		</div>
 	{:else if type === 'deal' || type === 'dealItem'}
-		<a class="deal-button" {href}>{actionName}</a>
+		{#if actionName === 'Detail'}
+			<a class="deal-button" {href}>{actionName}</a>
+		{:else if actionName === 'Delete'}
+			<button on:click={() => action(element.id)}>
+				{actionName}
+			</button>
+		{/if}
 	{:else if type === 'product' || type === 'category'}
 		<button on:click={() => action(element.id)}>
 			{actionName}

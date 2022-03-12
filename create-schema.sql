@@ -1,5 +1,8 @@
 create table cart (
-    id int generated always as identity primary key
+    id int generated always as identity primary key,
+    price dec not null check(price >= 0),
+    quantity int not null check(quantity >= 0),
+    datestamp text not null
 );
 
 create table category (
@@ -34,7 +37,6 @@ create table picture (
 create table deal (
     id int generated always as identity primary key,
     code text not null,
-    datestamp text not null,
     cartId int not null,
     foreign key(cartId) references cart(id) on delete cascade
 );

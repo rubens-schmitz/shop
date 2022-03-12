@@ -5,13 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
-
-type GetCategoryResponse struct {
-	Id    int    `json:"id"`
-	Title string `json:"title"`
-}
 
 func PostCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
@@ -32,7 +28,7 @@ func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	category := &GetCategoryResponse{Id: id}
+	category := types.GetCategoryResponse{Id: id}
 	query := "select title from category where id = $1"
 	row := util.DB.QueryRow(query, id)
 	err = row.Scan(&category.Title)

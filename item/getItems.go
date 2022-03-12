@@ -5,27 +5,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/cart"
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
-type GetItemResponse struct {
-	Id        int      `json:"id"`
-	ProductId int      `json:"productId"`
-	Title     string   `json:"title"`
-	Price     float32  `json:"price"`
-	Pictures  []string `json:"pictures"`
-	Quantity  int      `json:"quantity"`
-}
-
-type GetItemsParams struct {
-	Title      string
-	Offset     int
-	Limit      int
-	CategoryId int
-	CartId     int
-}
-
-func parseParams(w http.ResponseWriter, r *http.Request) GetItemsParams {
+func parseParams(w http.ResponseWriter, r *http.Request) types.GetItemsParams {
 	title := util.GetStringParam(r, "title")
 	limit, err := util.GetIntParam(r, "limit")
 	if err != nil {
@@ -44,13 +29,13 @@ func parseParams(w http.ResponseWriter, r *http.Request) GetItemsParams {
 		log.Fatal(err)
 	}
 	if cartId == 0 {
-		cartId = util.GetCartId(w, r)
+		cartId = cart.GetCartId(w, r)
 	}
-	return GetItemsParams{Title: title, Limit: limit, Offset: offset,
+	return types.GetItemsParams{Title: title, Limit: limit, Offset: offset,
 		CategoryId: categoryId, CartId: cartId}
 }
 
-func queryRows(params GetItemsParams) *sql.Rows {
+func queryRows(params types.GetItemsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -81,10 +66,10 @@ func queryRows(params GetItemsParams) *sql.Rows {
 	return rows
 }
 
-func makeItems(rows *sql.Rows) []GetItemResponse {
-	items := make([]GetItemResponse, 0)
+func makeItems(rows *sql.Rows) []types.GetItemResponse {
+	items := make([]types.GetItemResponse, 0)
 	for rows.Next() {
-		item := new(GetItemResponse)
+		item := new(types.GetItemResponse)
 		err := rows.Scan(&item.Id, &item.ProductId, &item.Title, &item.Price,
 			&item.Quantity)
 		if err != nil {
@@ -96,7 +81,7 @@ func makeItems(rows *sql.Rows) []GetItemResponse {
 	return items
 }
 
-func GetItems(params GetItemsParams) []GetItemResponse {
+func GetItems(params types.GetItemsParams) []types.GetItemResponse {
 	rows := queryRows(params)
 	defer rows.Close()
 	items := makeItems(rows)

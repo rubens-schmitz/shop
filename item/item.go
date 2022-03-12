@@ -6,15 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rubens-schmitz/shop/cart"
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
-
-type PostItemRequest struct {
-	Id        int `json:"id"`
-	ProductId int `json:"productId"`
-	CartId    int `json:"cartId"`
-	Quantity  int `json:"quantity"`
-}
 
 func PostItemHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
@@ -25,8 +20,8 @@ func PostItemHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cartId := util.GetCartId(w, r)
-	item := PostItemRequest{ProductId: productId, CartId: cartId}
+	cartId := cart.GetCartId(w, r)
+	item := types.PostItemRequest{ProductId: productId, CartId: cartId}
 	query := `select id, quantity from item where productId = $1 and cartId = $2`
 	row := util.DB.QueryRow(query, productId, cartId)
 	err = row.Scan(&item.Id, &item.Quantity)
@@ -49,6 +44,7 @@ func PostItemHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cart.Update(cartId)
 	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }
 
@@ -72,6 +68,7 @@ func PutItemHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cart.Update(cart.GetCartId(w, r))
 	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }
 
@@ -86,5 +83,6 @@ func DeleteItemHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cart.Update(cart.GetCartId(w, r))
 	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
 }

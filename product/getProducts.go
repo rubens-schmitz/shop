@@ -5,29 +5,30 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
-func parseParams(r *http.Request) (GetProductsParams, error) {
+func parseParams(r *http.Request) (types.GetProductsParams, error) {
 	limit, err := util.GetIntParam(r, "limit")
 	if err != nil {
-		return GetProductsParams{}, err
+		return types.GetProductsParams{}, err
 	}
 	offset, err := util.GetIntParam(r, "offset")
 	if err != nil {
-		return GetProductsParams{}, err
+		return types.GetProductsParams{}, err
 	}
 	categoryId, err := util.GetIntParam(r, "categoryId")
 	if err != nil {
-		return GetProductsParams{}, err
+		return types.GetProductsParams{}, err
 	}
 	title := util.GetStringParam(r, "title")
-	params := GetProductsParams{Limit: limit, Offset: offset,
+	params := types.GetProductsParams{Limit: limit, Offset: offset,
 		CategoryId: categoryId, Title: title}
 	return params, nil
 }
 
-func queryRows(params GetProductsParams) *sql.Rows {
+func queryRows(params types.GetProductsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -51,10 +52,10 @@ func queryRows(params GetProductsParams) *sql.Rows {
 	return rows
 }
 
-func makeProducts(rows *sql.Rows) []GetProductResponse {
-	products := make([]GetProductResponse, 0)
+func makeProducts(rows *sql.Rows) []types.GetProductResponse {
+	products := make([]types.GetProductResponse, 0)
 	for rows.Next() {
-		product := new(GetProductResponse)
+		product := new(types.GetProductResponse)
 		err := rows.Scan(&product.Id, &product.Title,
 			&product.Price, &product.CategoryId)
 		if err != nil {

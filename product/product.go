@@ -2,31 +2,14 @@ package product
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
-
-type GetProductResponse struct {
-	Id         int      `json:"id"`
-	Title      string   `json:"title"`
-	Price      float32  `json:"price"`
-	CategoryId int      `json:"categoryId"`
-	Pictures   []string `json:"pictures"`
-}
-
-type GetProductsParams struct {
-	Limit      int
-	Offset     int
-	CategoryId int
-	Title      string
-}
-
-var errNoProduct = errors.New("The requested product does not exist.")
 
 func PostProductHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
@@ -68,7 +51,7 @@ func GetProductHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	pictures := util.GetPictures(id)
-	product := GetProductResponse{Id: id, Pictures: pictures}
+	product := types.GetProductResponse{Id: id, Pictures: pictures}
 	query := "select title, price, categoryId from product where id=$1"
 	row := util.DB.QueryRow(query, id)
 	err = row.Scan(&product.Title, &product.Price, &product.CategoryId)

@@ -5,34 +5,30 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rubens-schmitz/shop/item"
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
-type GetDealsParams struct {
-	Limit  int
-	Offset int
-}
-
-func parseParams(r *http.Request) (GetDealsParams, error) {
+func parseParams(r *http.Request) (types.GetDealsParams, error) {
 	limit, err := util.GetIntParam(r, "limit")
 	if err != nil {
-		return GetDealsParams{}, err
+		return types.GetDealsParams{}, err
 	}
 	offset, err := util.GetIntParam(r, "offset")
 	if err != nil {
-		return GetDealsParams{}, err
+		return types.GetDealsParams{}, err
 	}
-	params := GetDealsParams{Limit: limit, Offset: offset}
+	params := types.GetDealsParams{Limit: limit, Offset: offset}
 	return params, nil
 }
 
-func queryRows(params GetDealsParams) *sql.Rows {
+func queryRows(params types.GetDealsParams) *sql.Rows {
 	var query string
 	var rows *sql.Rows
 	var err error
-	query = `select id, datestamp, cartId from deal
-			 order by datestamp desc limit $1 offset $2`
+	query = `select deal.id, cart.price, cart.quantity, cart.datestamp
+			 from deal inner join cart on cart.id = deal.cartId
+			 order by cart.datestamp desc limit $1 offset $2`
 	rows, err = util.DB.Query(query, params.Limit, params.Offset)
 	if err != nil {
 		log.Fatal(err)
@@ -40,21 +36,16 @@ func queryRows(params GetDealsParams) *sql.Rows {
 	return rows
 }
 
-func makeDeals(rows *sql.Rows) []GetDealResponse {
-	deals := make([]GetDealResponse, 0)
+func makeDeals(rows *sql.Rows) []types.GetDealResponse {
+	deals := make([]types.GetDealResponse, 0)
 	for rows.Next() {
-		deal := new(GetDealResponse)
-		var cartId int
+		deal := new(types.GetDealResponse)
 		var datestamp string
-		err := rows.Scan(&deal.Id, &datestamp, &cartId)
+		err := rows.Scan(&deal.Id, &deal.Price, &deal.Quantity, &datestamp)
+		deal.Datestamp = util.ShortDatestamp(datestamp)
 		if err != nil {
 			log.Fatal(err)
 		}
-		deal.Datestamp = shortDatestamp(datestamp)
-		params := item.GetItemsParams{Title: "", Offset: 0, Limit: 16,
-			CategoryId: 0, CartId: cartId}
-		items := item.GetItems(params)
-		deal.Price, deal.Quantity = computePriceAndQuantity(items)
 		deals = append(deals, *deal)
 	}
 	return deals

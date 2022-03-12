@@ -66,6 +66,12 @@
 			<Fa icon={faEye} />
 		</a>
 	</div>
+    <div class:active={$page.url.pathname === '/delete/deal'}>
+		<a sveltekit:prefetch href="/delete/deal">
+			<span>Delete deal</span>
+			<Fa icon={faMinus} />
+		</a>
+	</div>
 </section>
 
 <style>

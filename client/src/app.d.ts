@@ -50,6 +50,11 @@ interface GetDealResponse {
 	cartId: number;
 }
 
+interface GetCartResponse {
+    price: number;
+    quantity: number;
+}
+
 type ListActionFn = (id: number) => Promise<any>;
 
 type ListGetElementsFn = (
