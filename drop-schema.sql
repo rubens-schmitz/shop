@@ -1,3 +1,4 @@
+drop table access;
 drop table product cascade;
 drop table cart cascade;
 drop table item cascade;

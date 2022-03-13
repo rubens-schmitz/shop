@@ -45,6 +45,7 @@ type GetDealResponse struct {
 	Price     float32 `json:"price"`
 	Quantity  int     `json:"quantity"`
 	Datestamp string  `json:"datestamp"`
+	CartId    int     `json:"cartId"`
 }
 
 type PostItemRequest struct {

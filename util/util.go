@@ -68,10 +68,10 @@ func GetIntParam(r *http.Request, name string) (int, error) {
 	arr := r.URL.Query()[name]
 	val := 0
 	var err error
-	if len(arr) != 0 {
+	if len(arr) > 0 {
 		val, err = strconv.Atoi(arr[0])
 		if err != nil {
-			log.Fatal(err)
+			return 0, err
 		}
 		if val < 0 {
 			s := fmt.Sprintf("Parameter '%v' is less than zero.", name)
@@ -82,9 +82,9 @@ func GetIntParam(r *http.Request, name string) (int, error) {
 }
 
 func GetStringParam(r *http.Request, name string) string {
-	arr := r.URL.Query()[""]
+	arr := r.URL.Query()[name]
 	val := ""
-	if len(arr) != 0 {
+	if len(arr) > 0 {
 		val = arr[0]
 	}
 	return val

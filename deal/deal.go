@@ -4,24 +4,21 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/access"
 	"github.com/rubens-schmitz/shop/cart"
 	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
-	"github.com/sethvargo/go-password/password"
 )
 
 func PostDealHandler(w http.ResponseWriter, r *http.Request) {
-	code, err := password.Generate(64, 10, 10, false, false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	accessId := access.CreateAccess("deal")
 	cartId := cart.GetCartId(w, r)
-	query := `insert into deal (code, cartId) values ($1, $2)`
-	_, err = util.DB.Exec(query, code, cartId)
+	query := `insert into deal (accessId, cartId) values ($1, $2)`
+	_, err := util.DB.Exec(query, accessId, cartId)
 	if err != nil {
 		log.Fatal(err)
 	}
-	qrcode := util.EncodeQRCode(code)
+	qrcode := util.EncodeQRCode(access.GetCode(accessId))
 	res := types.PostDealResponse{Qrcode: qrcode}
 	cart.AddNewCartIdCookie(w, r)
 	util.WriteAsJSON(w, res)
@@ -32,16 +29,16 @@ func GetDealHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	query := `select cart.price, cart.quantity, cart.datestamp
+	query := `select cart.price, cart.quantity, cart.datestamp, deal.cartId
 			  from deal inner join cart on cart.id = deal.cartId
-			  where id = $1`
+			  where deal.id = $1`
 	row := util.DB.QueryRow(query, id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	deal := types.GetDealResponse{Id: id}
 	var datestamp string
-	row.Scan(&deal.Price, &deal.Quantity, &datestamp)
+	row.Scan(&deal.Price, &deal.Quantity, &datestamp, &deal.CartId)
 	deal.Datestamp = util.ShortDatestamp(datestamp)
 	if err != nil {
 		log.Fatal(err)

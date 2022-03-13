@@ -38,8 +38,9 @@ export async function getProducts(
 	title = '',
 	category = 0
 ) {
-	let params = `?limit=${limit}&offset=${offset}&title=${title}&categoryId=${category}`;
-	const res = await fetch(`/api/products${params}`);
+	let params = `?limit=${limit}&offset=${offset}&title=${title}`;
+    params += `&categoryId=${category}`
+	const res = await fetch(`/api/products/${params}`);
 	const rawProducts = await res.json();
 	let products = [];
 	for (let i = 0; i < rawProducts.length; i++)

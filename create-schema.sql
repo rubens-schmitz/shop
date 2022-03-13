@@ -10,6 +10,12 @@ create table category (
     title text not null
 );
 
+create table access (
+    id int generated always as identity primary key,
+    class text not null,
+    code text not null
+);
+
 create table product (
     id int generated always as identity primary key,
     title text not null,
@@ -36,7 +42,8 @@ create table picture (
 
 create table deal (
     id int generated always as identity primary key,
-    code text not null,
+    accessId int not null,
     cartId int not null,
+    foreign key(accessId) references access(id) on delete cascade,
     foreign key(cartId) references cart(id) on delete cascade
 );
