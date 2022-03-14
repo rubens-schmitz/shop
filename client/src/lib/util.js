@@ -8,3 +8,15 @@ export function getURLIdParam() {
 	if (match === null) return undefined;
 	return parseInt(match[1]);
 }
+
+/**
+ * @param {string} name
+ * @return {string}
+ */
+export function getCookieValue(name) {
+	return (
+		document.cookie
+			.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+			?.pop() || ''
+	);
+}

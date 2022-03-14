@@ -1,36 +1,37 @@
 <script lang="ts">
 	import { modal, qrcode } from '$lib/stores.js';
 
-	let a: HTMLAnchorElement;
-
-	function prepHref() {
-		a.href = $qrcode;
-	}
-
 	function closeModal() {
 		$modal = '';
+	}
+
+	function closeModalAndReload() {
+		closeModal();
+		window.location.reload();
 	}
 </script>
 
 {#if $modal != ''}
 	<div class="modal-overlay">
 		<div class="modal-inside">
-			{#if $modal === 'buyCart'}
+			{#if $modal === 'accessResponse'}
 				<span>Operation completed successfully</span>
-				<span>Please download the invoice</span>
+				<span>Download the access qrcode</span>
 				<img src={$qrcode} alt="qrcode" />
-				<a
-					bind:this={a}
-					class="qrcode-button"
-					download="qrcode.png"
-					href={$qrcode}
-				>
+				<a class="qrcode-button" download="qrcode.png" href={$qrcode}>
 					Download
 				</a>
+				<button on:click={closeModalAndReload}>OK</button>
+			{:else if $modal === 'loginSuccess'}
+				<span>Login completed successfully</span>
+				<button on:click={closeModalAndReload}>OK</button>
+			{:else if $modal === 'loginFailure'}
+				<span>Login failed</span>
+				<button on:click={closeModal}>OK</button>
 			{:else}
 				<span>Operation completed successfully</span>
+				<button on:click={closeModal}>OK</button>
 			{/if}
-			<button on:click={closeModal}>OK</button>
 		</div>
 	</div>
 {/if}
@@ -68,7 +69,7 @@
 		padding: 8px;
 	}
 	.qrcode-button:hover {
-        text-decoration: none;
+		text-decoration: none;
 		background-color: var(--accent-color-darker);
 	}
 </style>

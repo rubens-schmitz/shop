@@ -3,10 +3,69 @@ package access
 import (
 	"database/sql"
 	"log"
+	"net/http"
 
+	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 	"github.com/sethvargo/go-password/password"
 )
+
+func CreateAdminHandler(w http.ResponseWriter, r *http.Request) {
+	acc := CreateAccess("admin")
+	code := GetCode(acc)
+	qrcode := util.EncodeQRCode(code)
+	res := types.CreateAdminResponse{Qrcode: qrcode}
+	util.WriteAsJSON(w, res)
+}
+
+func AdminExistHandler(w http.ResponseWriter, r *http.Request) {
+	query := `select id from access where class = 'admin'`
+	row := util.DB.QueryRow(query)
+	var id int
+	err := row.Scan(&id)
+	var res types.AdminExistResponse
+	if err == sql.ErrNoRows {
+		res.Sucess = false
+	} else {
+		res.Sucess = true
+	}
+	util.WriteAsJSON(w, res)
+}
+
+func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		log.Fatal(err)
+	}
+	qrcode := r.FormValue("qrcode")
+	code := util.DecodeQRCode(qrcode)
+	query := `select id from access where class = $1 and code = $2`
+	row := util.DB.QueryRow(query, "admin", code)
+	var id int
+	err = row.Scan(&id)
+	var res types.AdminLoginResponse
+	if err == sql.ErrNoRows {
+		res.Sucess = false
+	} else {
+		res.Sucess = true
+		addAdminCookie(w, r)
+	}
+	util.WriteAsJSON(w, res)
+}
+
+func addAdminCookie(w http.ResponseWriter, r *http.Request) {
+	cookie := &http.Cookie{Name: "admin", Value: "true", Path: "/"}
+	http.SetCookie(w, cookie)
+	r.AddCookie(cookie)
+}
+
+func IsAdmin(r *http.Request) bool {
+	_, err := r.Cookie("admin")
+	if err != nil {
+		return false
+	}
+	return true
+}
 
 func CreateAccess(class string) int {
 	code := generateCode()

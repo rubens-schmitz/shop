@@ -53,7 +53,7 @@
 	async function buyCart() {
 		let res = await postDeal();
 		$qrcode = res.qrcode;
-		$modal = 'buyCart';
+		$modal = 'accessResponse';
 		goto('/');
 	}
 

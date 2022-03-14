@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/rubens-schmitz/shop/access"
 	"github.com/rubens-schmitz/shop/cart"
 	"github.com/rubens-schmitz/shop/category"
 	"github.com/rubens-schmitz/shop/deal"
@@ -137,6 +138,22 @@ func handler() http.Handler {
 				deal.GetDealHandler(w, r)
 			case "DELETE":
 				deal.DeleteDealHandler(w, r)
+			}
+			return
+		}
+
+		match, err = regexp.Match("/api/access/admin", path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if match {
+			switch r.Method {
+			case "POST":
+				access.CreateAdminHandler(w, r)
+			case "GET":
+				access.AdminExistHandler(w, r)
+			case "PUT":
+				access.AdminLoginHandler(w, r)
 			}
 			return
 		}

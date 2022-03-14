@@ -1,5 +1,6 @@
-compute price and quantity at time of deal, store in DB
-implement deal
+try not to use file at util.EncodeQRCode
+
+implement access
 
 choose icon for category from FontAwesome
 show search bar in nav on big window

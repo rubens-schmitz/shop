@@ -1,4 +1,4 @@
-drop table access;
+drop table access cascade;
 drop table product cascade;
 drop table cart cascade;
 drop table item cascade;

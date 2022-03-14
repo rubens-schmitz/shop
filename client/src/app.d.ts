@@ -8,6 +8,18 @@ interface PostCategoryRequest {
 	title: string;
 }
 
+interface AdminExistResponse {
+    success: boolean;
+}
+
+interface CreateAdminResponse {
+    qrcode: string;
+}
+
+interface LoginAdminResponse {
+    success: boolean;
+}
+
 interface GetCategoryResponse {
 	id: number;
 	title: string;

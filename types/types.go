@@ -31,6 +31,18 @@ type GetProductsParams struct {
 	Title      string
 }
 
+type AdminExistResponse struct {
+	Sucess bool `json:"success"`
+}
+
+type AdminLoginResponse struct {
+	Sucess bool `json:"success"`
+}
+
+type CreateAdminResponse struct {
+	Qrcode string `json:"qrcode"`
+}
+
 type PostDealResponse struct {
 	Qrcode string `json:"qrcode"`
 }

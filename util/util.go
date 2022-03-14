@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
@@ -13,6 +14,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
@@ -97,6 +99,9 @@ func EncodeQRCode(code string) string {
 		log.Fatal(err)
 	}
 	file, err := os.CreateTemp("", "")
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer file.Close()
 	err = png.Encode(file, img)
 	if err != nil {
@@ -111,17 +116,19 @@ func EncodeQRCode(code string) string {
 	return qrcode
 }
 
-// func DecodeQRCode(qrcode string) {
-// 	// open and decode image file
-// 	file, _ := os.Open("qrcode.png")
-// 	img, _, _ := image.Decode(file)
-
-// 	// prepare BinaryBitmap
-// 	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
-
-// 	// decode image
-// 	qrReader := qrcode.NewQRCodeReader()
-// 	result, _ := qrReader.Decode(bmp, nil)
-
-// 	log.Println(result)
-// }
+func DecodeQRCode(qrc string) string {
+	b64data := qrc[strings.IndexByte(qrc, ',')+1:]
+	unbased, err := base64.StdEncoding.DecodeString(b64data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r := bytes.NewReader(unbased)
+	img, err := png.Decode(r)
+	if err != nil {
+		log.Println(err)
+	}
+	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
+	qrReader := qrcode.NewQRCodeReader()
+	result, _ := qrReader.Decode(bmp, nil)
+	return result.String()
+}
