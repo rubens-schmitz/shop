@@ -31,7 +31,8 @@ func PostItemHandler(w http.ResponseWriter, r *http.Request) {
 			_, err = util.DB.Exec(query, productId, cartId)
 			if err != nil {
 				log.Println(err)
-				util.WriteAsJSON(w, util.ErrorResponse{Ok: false, Error: err.Error()})
+				util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+					Msg: err.Error()})
 				return
 			}
 		} else {
@@ -45,7 +46,8 @@ func PostItemHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	cart.Update(cartId)
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Item added"})
 }
 
 func PutItemHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,8 +61,8 @@ func PutItemHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	if quantity <= 0 {
-		util.WriteAsJSON(w, util.ErrorResponse{
-			Ok: false, Error: "Parameter 'quantity' is less than or equal zero."})
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "Parameter 'quantity' is less than or equal zero."})
 		return
 	}
 	query := `update item set quantity = $1 where id = $2`
@@ -69,7 +71,8 @@ func PutItemHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	cart.Update(cart.GetCartId(w, r))
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Item changed"})
 }
 
 func DeleteItemHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,5 +87,6 @@ func DeleteItemHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	cart.Update(cart.GetCartId(w, r))
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Item deleted"})
 }

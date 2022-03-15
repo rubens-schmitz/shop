@@ -5,7 +5,7 @@
 	import { getCategories } from '$lib/api/category.js';
 	import { postDeal } from './api/deal';
 	import { getCart } from './api/cart';
-	import { modal, qrcode } from '$lib/stores.js';
+	import { modal, modalMsg, qrcode } from '$lib/stores.js';
 
 	export let limit = 16;
 	export let getElements: ListGetElementsFn;
@@ -14,6 +14,7 @@
 	export let updateAfterAction = false;
 	export let type: string;
 	export let dealItem: GetDealResponse = undefined;
+	export let showAlert = false;
 
 	let search = '';
 	let elements = [];
@@ -27,7 +28,12 @@
 	}
 
 	async function action(id: number) {
-		await actionFn(id);
+		const raw = await actionFn(id);
+		const res = await raw.json();
+		if (showAlert || !res.success) {
+			$modalMsg = res.msg;
+			$modal = 'alert';
+		}
 		if (updateAfterAction) update();
 	}
 
@@ -53,7 +59,7 @@
 	async function buyCart() {
 		let res = await postDeal();
 		$qrcode = res.qrcode;
-		$modal = 'accessResponse';
+		$modal = 'buyCart';
 		goto('/');
 	}
 

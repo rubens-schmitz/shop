@@ -48,20 +48,26 @@ func AdminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		res.Sucess = false
 	} else {
 		res.Sucess = true
-		addAdminCookie(w, r)
+		addAdminCookie(w, code)
 	}
 	util.WriteAsJSON(w, res)
 }
 
-func addAdminCookie(w http.ResponseWriter, r *http.Request) {
-	cookie := &http.Cookie{Name: "admin", Value: "true", Path: "/"}
+func addAdminCookie(w http.ResponseWriter, code string) {
+	cookie := &http.Cookie{Name: "admin", Value: code, Path: "/"}
 	http.SetCookie(w, cookie)
-	r.AddCookie(cookie)
 }
 
 func IsAdmin(r *http.Request) bool {
-	_, err := r.Cookie("admin")
+	code, err := r.Cookie("admin")
 	if err != nil {
+		return false
+	}
+	query := `select id from access where class = 'admin' and code = $1`
+	row := util.DB.QueryRow(query, code.Value)
+	var id int
+	err = row.Scan(&id)
+	if err == sql.ErrNoRows {
 		return false
 	}
 	return true

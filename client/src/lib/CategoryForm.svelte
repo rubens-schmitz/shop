@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import { getCategory } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-    import { modal } from '$lib/stores.js'
+	import { modal, modalMsg } from '$lib/stores.js';
 
 	export let actionFn: FormActionFn;
 	export let actionName: string;
@@ -15,15 +17,18 @@
 		return undefined;
 	}
 
-	function tryAction() {
+	async function tryAction() {
 		const invalidField = getInvalidField();
 		if (invalidField !== undefined) {
 			invalidField.focus();
 			return;
 		}
 		let request = makeRequest(id, title.value);
-		actionFn(request);
-        $modal = 'success'
+		const rawRes = await actionFn(request);
+		const res = await rawRes.json();
+		$modalMsg = res.msg;
+		$modal = 'alert';
+		goto('/login');
 	}
 
 	async function fetchCategory() {

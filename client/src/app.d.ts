@@ -9,15 +9,15 @@ interface PostCategoryRequest {
 }
 
 interface AdminExistResponse {
-    success: boolean;
+	success: boolean;
 }
 
 interface CreateAdminResponse {
-    qrcode: string;
+	qrcode: string;
 }
 
 interface LoginAdminResponse {
-    success: boolean;
+	success: boolean;
 }
 
 interface GetCategoryResponse {
@@ -63,8 +63,8 @@ interface GetDealResponse {
 }
 
 interface GetCartResponse {
-    price: number;
-    quantity: number;
+	price: number;
+	quantity: number;
 }
 
 type ListActionFn = (id: number) => Promise<any>;
@@ -86,7 +86,7 @@ interface ListElement {
 	datestamp?: string;
 }
 
-type FormActionFn = (request: any) => void;
+type FormActionFn = (request: any) => Promise<any>;
 
 type MakeCategoryRequest = (id: number, title: string) => any;
 

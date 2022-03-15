@@ -61,7 +61,8 @@ func makeCategories(rows *sql.Rows) []types.GetCategoryResponse {
 func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := parseParams(r)
 	if err != nil {
-		util.WriteAsJSON(w, &util.ErrorResponse{Ok: false, Error: err.Error()})
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: err.Error()})
 		return
 	}
 	rows := queryRows(params)

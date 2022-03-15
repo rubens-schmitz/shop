@@ -1,13 +1,20 @@
-try not to use file at util.EncodeQRCode
-
-implement access
-
 choose icon for category from FontAwesome
 show search bar in nav on big window
 change colors, style on site
 payment
 zoom on preview
 allow video
+
+problem with seen deals with deleted products
+
+unify "cartId" and "admin" in a sigle "session"
+
+is the auth system secure?
+    qrcode based auth
+    password is attached to header
+    password needed for operations
+    screen with operations are available to users
+        with a little bit of hacking
 
 ListGetElementsFn
     is categoryId really necessary?

@@ -25,6 +25,9 @@ func PostDealHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetDealHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		return
+	}
 	id, err := util.GetIntParam(r, "id")
 	if err != nil {
 		log.Fatal(err)
@@ -47,6 +50,9 @@ func GetDealHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteDealHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -57,5 +63,5 @@ func DeleteDealHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true, Msg: ""})
 }

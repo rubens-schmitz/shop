@@ -7,11 +7,17 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rubens-schmitz/shop/access"
 	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
 func PostProductHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +42,8 @@ func PostProductHandler(w http.ResponseWriter, r *http.Request) {
 		query = "insert into picture (productId, bytes) values ($1, $2)"
 		_, err = util.DB.Exec(query, id, bytes)
 	}
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Product posted"})
 }
 
 func extractPicture(r *http.Request, n int) []byte {
@@ -66,6 +73,11 @@ func GetProductHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PutProductHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -88,10 +100,16 @@ func PutProductHandler(w http.ResponseWriter, r *http.Request) {
 		query = "insert into picture (productId, bytes) values ($1, $2)"
 		_, err = util.DB.Exec(query, id, bytes)
 	}
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Product changed"})
 }
 
 func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -102,5 +120,6 @@ func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Product deleted"})
 }

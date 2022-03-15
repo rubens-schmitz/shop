@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import Fa from 'svelte-fa/src/fa.svelte';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 	import { getProduct } from '$lib/api/product.js';
 	import { getCategories } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { modal } from '$lib/stores.js';
+	import { modal, modalMsg } from '$lib/stores.js';
 
 	interface Picture {
 		id: number;
@@ -111,7 +113,7 @@
 		return result;
 	}
 
-	function tryAction() {
+	async function tryAction() {
 		const invalidField = getInvalidField();
 		if (invalidField !== undefined) {
 			invalidField.focus();
@@ -124,8 +126,11 @@
 			parseInt(category.value),
 			getResquestPictures()
 		);
-		actionFn(request);
-		$modal = 'success';
+		const rawRes = await actionFn(request);
+		const res = await rawRes.json();
+		$modalMsg = res.msg;
+		$modal = 'alert';
+		goto('/login');
 	}
 
 	async function fetchElement() {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modal, qrcode } from '$lib/stores.js';
+	import { modal, modalMsg, qrcode } from '$lib/stores.js';
 
 	function closeModal() {
 		$modal = '';
@@ -14,14 +14,14 @@
 {#if $modal != ''}
 	<div class="modal-overlay">
 		<div class="modal-inside">
-			{#if $modal === 'accessResponse'}
+			{#if $modal === 'buyCart'}
 				<span>Operation completed successfully</span>
 				<span>Download the access qrcode</span>
 				<img src={$qrcode} alt="qrcode" />
 				<a class="qrcode-button" download="qrcode.png" href={$qrcode}>
 					Download
 				</a>
-				<button on:click={closeModalAndReload}>OK</button>
+				<button on:click={closeModal}>OK</button>
 			{:else if $modal === 'loginSuccess'}
 				<span>Login completed successfully</span>
 				<button on:click={closeModalAndReload}>OK</button>
@@ -29,7 +29,7 @@
 				<span>Login failed</span>
 				<button on:click={closeModal}>OK</button>
 			{:else}
-				<span>Operation completed successfully</span>
+				<span>{$modalMsg}</span>
 				<button on:click={closeModal}>OK</button>
 			{/if}
 		</div>

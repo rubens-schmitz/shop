@@ -5,11 +5,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/access"
 	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
 
 func PostCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -20,7 +26,8 @@ func PostCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Category created"})
 }
 
 func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +50,11 @@ func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PutCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -54,10 +66,16 @@ func PutCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Category changed"})
 }
 
 func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
+		return
+	}
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Fatal(err)
@@ -68,5 +86,6 @@ func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, &util.ErrorResponse{Ok: true, Error: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Category deleted"})
 }

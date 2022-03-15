@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rubens-schmitz/shop/access"
 	"github.com/rubens-schmitz/shop/types"
 	"github.com/rubens-schmitz/shop/util"
 )
@@ -52,6 +53,9 @@ func makeDeals(rows *sql.Rows) []types.GetDealResponse {
 }
 
 func GetDealsHandler(w http.ResponseWriter, r *http.Request) {
+	if !access.IsAdmin(r) {
+		return
+	}
 	params, err := parseParams(r)
 	if err != nil {
 		log.Fatal(err)

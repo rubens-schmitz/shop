@@ -8,10 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"image/png"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,11 +17,6 @@ import (
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
 )
-
-type ErrorResponse struct {
-	Ok    bool   `json:"id"`
-	Error string `json:"error"`
-}
 
 var DB *sql.DB
 
@@ -98,19 +91,12 @@ func EncodeQRCode(code string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	file, err := os.CreateTemp("", "")
+	var buf bytes.Buffer
+	err = png.Encode(&buf, img)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
-	err = png.Encode(file, img)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data, err := ioutil.ReadFile(file.Name())
-	if err != nil {
-		log.Fatal(err)
-	}
+	data := buf.Bytes()
 	qrcode := "data:image/png;base64,"
 	qrcode += base64.StdEncoding.EncodeToString(data)
 	return qrcode
