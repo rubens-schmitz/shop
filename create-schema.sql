@@ -7,7 +7,8 @@ create table cart (
 
 create table category (
     id int generated always as identity primary key,
-    title text not null
+    title text not null,
+    deleted boolean default false
 );
 
 create table access (
@@ -20,6 +21,7 @@ create table product (
     id int generated always as identity primary key,
     title text not null,
     price dec not null check(price >= 0),
+    deleted boolean default false,
     categoryId int not null,
     foreign key(categoryId) references category(id) on delete cascade
 );

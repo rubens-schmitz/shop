@@ -7,7 +7,7 @@
 	import { getProduct } from '$lib/api/product.js';
 	import { getCategories } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { modal, modalMsg } from '$lib/stores.js';
+	import { dialog } from '$lib/stores.js';
 
 	interface Picture {
 		id: number;
@@ -128,8 +128,12 @@
 		);
 		const rawRes = await actionFn(request);
 		const res = await rawRes.json();
-		$modalMsg = res.msg;
-		$modal = 'alert';
+		$dialog = {
+			body: res.msg,
+			qrcode: '',
+			reload: false,
+			task: 'alert'
+		};
 		goto('/login');
 	}
 

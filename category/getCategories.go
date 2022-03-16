@@ -19,7 +19,8 @@ func parseParams(r *http.Request) (types.GetCategoriesParams, error) {
 		return types.GetCategoriesParams{}, err
 	}
 	title := util.GetStringParam(r, "title")
-	params := types.GetCategoriesParams{Limit: limit, Offset: offset, Title: title}
+	params := types.GetCategoriesParams{Limit: limit, Offset: offset,
+		Title: title}
 	return params, nil
 }
 
@@ -28,19 +29,17 @@ func queryRows(params types.GetCategoriesParams) *sql.Rows {
 	var rows *sql.Rows
 	var err error
 	if params.Limit == 0 {
-		query = `select * from category`
+		query = `select id, title from category where deleted = false`
 		rows, err = util.DB.Query(query)
-		if err != nil {
-			log.Fatal(err)
-		}
 	} else {
-		query = `select * from category where lower(title) 
-				 like lower('%' || $1 || '%') limit $2 offset $3`
+		query = `select id, title from category where deleted = false
+				 and lower(title) like lower('%' || $1 || '%')
+				 limit $2 offset $3`
 		rows, err = util.DB.Query(query, params.Title,
 			params.Limit, params.Offset)
-		if err != nil {
-			log.Fatal(err)
-		}
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 	return rows
 }

@@ -5,7 +5,7 @@
 	import { getCategories } from '$lib/api/category.js';
 	import { postDeal } from './api/deal';
 	import { getCart } from './api/cart';
-	import { modal, modalMsg, qrcode } from '$lib/stores.js';
+	import { dialog } from '$lib/stores.js';
 
 	export let limit = 16;
 	export let getElements: ListGetElementsFn;
@@ -15,6 +15,7 @@
 	export let type: string;
 	export let dealItem: GetDealResponse = undefined;
 	export let showAlert = false;
+	export let alertProps: Dialog = undefined;
 
 	let search = '';
 	let elements = [];
@@ -31,8 +32,14 @@
 		const raw = await actionFn(id);
 		const res = await raw.json();
 		if (showAlert || !res.success) {
-			$modalMsg = res.msg;
-			$modal = 'alert';
+			if (alertProps === undefined)
+				$dialog = {
+					body: res.msg,
+					qrcode: '',
+					reload: false,
+					task: 'alert'
+				};
+			else $dialog = alertProps;
 		}
 		if (updateAfterAction) update();
 	}
@@ -58,8 +65,12 @@
 
 	async function buyCart() {
 		let res = await postDeal();
-		$qrcode = res.qrcode;
-		$modal = 'buyCart';
+		$dialog = {
+			body: '',
+			qrcode: res.qrcode,
+			reload: false,
+			task: 'successWithQRCode'
+		};
 		goto('/');
 	}
 

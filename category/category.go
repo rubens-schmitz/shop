@@ -21,7 +21,7 @@ func PostCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	title := r.FormValue("title")
-	query := "insert into category (title) values ($1)"
+	query := `insert into category (title) values ($1)`
 	_, err = util.DB.Exec(query, title)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +36,7 @@ func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	category := types.GetCategoryResponse{Id: id}
-	query := "select title from category where id = $1"
+	query := `select title from category where id = $1`
 	row := util.DB.QueryRow(query, id)
 	err = row.Scan(&category.Title)
 	if err != nil {
@@ -61,7 +61,7 @@ func PutCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	id := r.FormValue("id")
 	title := r.FormValue("title")
-	query := "update category set title = $1 where id = $2"
+	query := `update category set title = $1 where id = $2`
 	_, err = util.DB.Exec(query, title, id)
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +81,12 @@ func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	id := r.FormValue("id")
-	query := "delete from category where id=$1"
+	query := `update category set deleted = true where id = $1`
+	_, err = util.DB.Exec(query, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	query = `update product set deleted = true where categoryId = $1`
 	_, err = util.DB.Exec(query, id)
 	if err != nil {
 		log.Fatal(err)

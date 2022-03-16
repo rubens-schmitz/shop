@@ -1,37 +1,34 @@
 <script lang="ts">
-	import { modal, modalMsg, qrcode } from '$lib/stores.js';
+	import { dialog } from '$lib/stores.js';
 
 	function closeModal() {
-		$modal = '';
-	}
-
-	function closeModalAndReload() {
-		closeModal();
-		window.location.reload();
+		if ($dialog.reload === true) window.location.reload();
+		$dialog.task = '';
 	}
 </script>
 
-{#if $modal != ''}
+{#if $dialog.task != ''}
 	<div class="modal-overlay">
 		<div class="modal-inside">
-			{#if $modal === 'buyCart'}
+			{#if $dialog.task === 'successWithQRCode'}
 				<span>Operation completed successfully</span>
 				<span>Download the access qrcode</span>
-				<img src={$qrcode} alt="qrcode" />
-				<a class="qrcode-button" download="qrcode.png" href={$qrcode}>
+				<img src={$dialog.qrcode} alt="qrcode" />
+				<a
+					class="qrcode-button"
+					download="qrcode.png"
+					href={$dialog.qrcode}
+				>
 					Download
 				</a>
-				<button on:click={closeModal}>OK</button>
-			{:else if $modal === 'loginSuccess'}
+			{:else if $dialog.task === 'loginSuccess'}
 				<span>Login completed successfully</span>
-				<button on:click={closeModalAndReload}>OK</button>
-			{:else if $modal === 'loginFailure'}
+			{:else if $dialog.task === 'loginFailure'}
 				<span>Login failed</span>
-				<button on:click={closeModal}>OK</button>
 			{:else}
-				<span>{$modalMsg}</span>
-				<button on:click={closeModal}>OK</button>
+				<span>{$dialog.body}</span>
 			{/if}
+			<button on:click={closeModal}>OK</button>
 		</div>
 	</div>
 {/if}

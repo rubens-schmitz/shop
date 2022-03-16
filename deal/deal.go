@@ -26,6 +26,8 @@ func PostDealHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetDealHandler(w http.ResponseWriter, r *http.Request) {
 	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
 		return
 	}
 	id, err := util.GetIntParam(r, "id")
@@ -51,6 +53,8 @@ func GetDealHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeleteDealHandler(w http.ResponseWriter, r *http.Request) {
 	if !access.IsAdmin(r) {
+		util.WriteAsJSON(w, types.SuccessResponse{Success: false,
+			Msg: "You don't have admin rights"})
 		return
 	}
 	err := r.ParseMultipartForm(32 << 20)
@@ -63,5 +67,6 @@ func DeleteDealHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	util.WriteAsJSON(w, types.SuccessResponse{Success: true, Msg: ""})
+	util.WriteAsJSON(w, types.SuccessResponse{Success: true,
+		Msg: "Deal deleted"})
 }

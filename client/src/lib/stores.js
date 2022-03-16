@@ -1,5 +1,8 @@
 import { writable } from 'svelte/store';
 
-export const modal = writable('');
-export const modalMsg = writable('');
-export const qrcode = writable('');
+/**
+ * @type {Dialog}
+ */
+const emptyDialog = { task: '', body: '', qrcode: '', reload: false };
+
+export const dialog = writable(emptyDialog);

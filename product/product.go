@@ -115,7 +115,7 @@ func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	id := r.FormValue("id")
-	query := `delete from product where id = $1`
+	query := `update product set deleted = true where id = $1`
 	_, err = util.DB.Exec(query, id)
 	if err != nil {
 		log.Fatal(err)

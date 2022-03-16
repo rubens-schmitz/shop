@@ -86,6 +86,13 @@ interface ListElement {
 	datestamp?: string;
 }
 
+interface Dialog {
+	task: string;
+	body: string;
+	reload: boolean;
+	qrcode: string;
+}
+
 type FormActionFn = (request: any) => Promise<any>;
 
 type MakeCategoryRequest = (id: number, title: string) => any;

@@ -61,6 +61,5 @@ export async function getDeal(id) {
 export async function deleteDeal(id) {
 	const body = new FormData();
 	body.append('id', String(id));
-	const res = await fetch(`/api/deal`, { method: 'DELETE', body });
-	return await res.json();
+	return await fetch(`/api/deal`, { method: 'DELETE', body });
 }

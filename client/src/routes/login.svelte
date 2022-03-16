@@ -5,7 +5,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa/src/fa.svelte';
 	import {
 		faPlus,
@@ -16,7 +15,7 @@
 	} from '@fortawesome/free-solid-svg-icons';
 
 	import { adminExist, createAdmin } from '$lib/api/access.js';
-	import { modal, qrcode } from '$lib/stores.js';
+	import { dialog } from '$lib/stores.js';
 	import { getCookieValue } from '$lib/util.js';
 	import { loginAdmin } from '$lib/api/access.js';
 
@@ -42,16 +41,23 @@
 		}
 	}
 
-	async function tryLoginAdmin(qrcode) {
+	async function tryLoginAdmin(qrcode: string) {
 		let res = await loginAdmin(qrcode);
-		if (res.success) $modal = 'loginSuccess';
-		else $modal = 'loginFailure';
+		$dialog = { body: '', qrcode: '', reload: false, task: '' };
+		if (res.success) {
+			$dialog.task = 'loginSuccess';
+			$dialog.reload = true;
+		} else $dialog.task = 'loginFailure';
 	}
 
 	async function onCreateAdmin() {
 		let res = await createAdmin();
-		$qrcode = res.qrcode;
-		$modal = 'accessResponse';
+		$dialog = {
+			body: '',
+			qrcode: res.qrcode,
+			reload: true,
+			task: 'successWithQRCode'
+		};
 	}
 </script>
 

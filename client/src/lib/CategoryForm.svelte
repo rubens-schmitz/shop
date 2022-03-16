@@ -3,7 +3,7 @@
 
 	import { getCategory } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { modal, modalMsg } from '$lib/stores.js';
+	import { dialog } from '$lib/stores.js';
 
 	export let actionFn: FormActionFn;
 	export let actionName: string;
@@ -26,8 +26,12 @@
 		let request = makeRequest(id, title.value);
 		const rawRes = await actionFn(request);
 		const res = await rawRes.json();
-		$modalMsg = res.msg;
-		$modal = 'alert';
+		$dialog = {
+			body: res.msg,
+			qrcode: '',
+			reload: false,
+			task: 'alert'
+		};
 		goto('/login');
 	}
 
