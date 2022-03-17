@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { dialog } from '$lib/stores.js';
+	import { modalOkButton } from '$lib/modal.js';
 
 	function closeModal() {
 		if ($dialog.reload === true) window.location.reload();
@@ -28,7 +29,7 @@
 			{:else}
 				<span>{$dialog.body}</span>
 			{/if}
-			<button on:click={closeModal}>OK</button>
+			<button id={modalOkButton} on:click={closeModal}>OK</button>
 		</div>
 	</div>
 {/if}

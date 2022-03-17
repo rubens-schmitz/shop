@@ -87,10 +87,10 @@ interface ListElement {
 }
 
 interface Dialog {
-	task: string;
-	body: string;
-	reload: boolean;
-	qrcode: string;
+	task?: string;
+	body?: string;
+	reload?: boolean;
+	qrcode?: string;
 }
 
 type FormActionFn = (request: any) => Promise<any>;

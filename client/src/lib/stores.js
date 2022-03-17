@@ -1,8 +1,4 @@
 import { writable } from 'svelte/store';
-
-/**
- * @type {Dialog}
- */
-const emptyDialog = { task: '', body: '', qrcode: '', reload: false };
+import { emptyDialog } from '$lib/modal.js'
 
 export const dialog = writable(emptyDialog);

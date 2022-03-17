@@ -7,7 +7,7 @@
 	import { getProduct } from '$lib/api/product.js';
 	import { getCategories } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { dialog } from '$lib/stores.js';
+	import { openModal } from '$lib/modal.js';
 
 	interface Picture {
 		id: number;
@@ -128,12 +128,7 @@
 		);
 		const rawRes = await actionFn(request);
 		const res = await rawRes.json();
-		$dialog = {
-			body: res.msg,
-			qrcode: '',
-			reload: false,
-			task: 'alert'
-		};
+		openModal({ body: res.msg, task: 'alert' });
 		goto('/login');
 	}
 
@@ -150,6 +145,10 @@
 		pictures = [...pictures, { id: pictures.length, preview: '' }];
 		showPicture = true;
 		return product;
+	}
+
+	function onKeypress(e: KeyboardEvent) {
+		if (e.key === 'Enter') tryAction();
 	}
 </script>
 
@@ -181,10 +180,20 @@
 
 		<div>
 			<span>Title</span>
-			<input value={product.title} bind:this={title} type="text" />
+			<input
+				on:keypress={onKeypress}
+				value={product.title}
+				bind:this={title}
+				type="text"
+			/>
 
 			<span>Price</span>
-			<input value={product.price} bind:this={price} type="number" />
+			<input
+				on:keypress={onKeypress}
+				value={product.price}
+				bind:this={price}
+				type="number"
+			/>
 
 			<span>Category</span>
 			{#await getCategories()}

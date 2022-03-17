@@ -3,7 +3,7 @@
 
 	import { getCategory } from '$lib/api/category.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { dialog } from '$lib/stores.js';
+	import { openModal } from '$lib/modal.js';
 
 	export let actionFn: FormActionFn;
 	export let actionName: string;
@@ -26,12 +26,7 @@
 		let request = makeRequest(id, title.value);
 		const rawRes = await actionFn(request);
 		const res = await rawRes.json();
-		$dialog = {
-			body: res.msg,
-			qrcode: '',
-			reload: false,
-			task: 'alert'
-		};
+		openModal({ body: res.msg, task: 'alert' });
 		goto('/login');
 	}
 
@@ -41,6 +36,10 @@
 		const category = await getCategory(id);
 		return category;
 	}
+
+	function onKeypress(e: KeyboardEvent) {
+		if (e.key === 'Enter') tryAction();
+	}
 </script>
 
 {#await fetchCategory()}
@@ -49,7 +48,12 @@
 	<form>
 		<div>
 			<span>Title</span>
-			<input value={category.title} bind:this={title} type="text" />
+			<input
+				on:keypress={onKeypress}
+				value={category.title}
+				bind:this={title}
+				type="text"
+			/>
 			<button type="button" on:click={tryAction}>{actionName}</button>
 		</div>
 	</form>

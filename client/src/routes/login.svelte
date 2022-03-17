@@ -10,12 +10,11 @@
 		faPlus,
 		faEdit,
 		faMinus,
-		faEye,
-		faUser
+		faEye
 	} from '@fortawesome/free-solid-svg-icons';
 
 	import { adminExist, createAdmin } from '$lib/api/access.js';
-	import { dialog } from '$lib/stores.js';
+	import { openModal } from '$lib/modal.js';
 	import { getCookieValue } from '$lib/util.js';
 	import { loginAdmin } from '$lib/api/access.js';
 
@@ -43,21 +42,17 @@
 
 	async function tryLoginAdmin(qrcode: string) {
 		let res = await loginAdmin(qrcode);
-		$dialog = { body: '', qrcode: '', reload: false, task: '' };
-		if (res.success) {
-			$dialog.task = 'loginSuccess';
-			$dialog.reload = true;
-		} else $dialog.task = 'loginFailure';
+		if (res.success) openModal({ task: 'loginSuccess', reload: true });
+		else openModal({ task: 'loginFailure' });
 	}
 
 	async function onCreateAdmin() {
 		let res = await createAdmin();
-		$dialog = {
-			body: '',
+		openModal({
 			qrcode: res.qrcode,
 			reload: true,
 			task: 'successWithQRCode'
-		};
+		});
 	}
 </script>
 

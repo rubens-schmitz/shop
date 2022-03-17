@@ -6,7 +6,7 @@
 	import { getProduct } from '$lib/api/product.js';
 	import { postItem } from '$lib/api/item.js';
 	import { getURLIdParam } from '$lib/util.js';
-	import { dialog } from '$lib/stores.js';
+	import { openModal } from '$lib/modal.js';
 
 	let title = '';
 	let pictureContainer: HTMLDivElement;
@@ -25,12 +25,7 @@
 
 	async function action(id: number) {
 		await postItem(id);
-		$dialog = {
-			body: '',
-			qrcode: '',
-			reload: false,
-			task: 'success'
-		};
+		openModal({ task: 'success' });
 	}
 </script>
 

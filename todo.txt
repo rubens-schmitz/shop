@@ -1,0 +1,62 @@
+current
+
+
+
+--------------------------------------------------------------------------------
+
+feat
+
+choose icon for category from FontAwesome
+show search bar in nav on big window
+change colors, style on site
+payment
+zoom on preview
+allow video
+
+--------------------------------------------------------------------------------
+
+refactor
+
+unite forms category and product
+unite cookies "cartId" and "admin" in a sigle "session"
+
+--------------------------------------------------------------------------------
+
+fix
+
+client/src/lib/List.svelte await getCategories() hack
+    
+--------------------------------------------------------------------------------
+
+discussion
+
+modal
+    should be called modal or dialog?
+    is the current strategy good?
+
+is the auth system secure?
+    qrcode based auth
+    password is attached to header
+    password needed for operations
+    screen with operations are available to users
+        with a little bit of hacking
+
+ListGetElementsFn
+    is categoryId really necessary?
+
+client/src/lib/Form.svelte,
+product.go
+    is there a better way to send multiple files?
+    is the current way ideal or good enough?
+
+--------------------------------------------------------------------------------
+
+annoyance
+
+Icons
+    Could not find a declaration file for module 'svelte-fa/src/fa.svelte'. 
+    '/home/u/shop/client/node_modules/svelte-fa/src/fa.svelte' implicitly has 
+    an 'any' type.ts(7016)
+
+tsconfig.json problems on vscode
+    Cannot write file ... because it would overwrite input file
